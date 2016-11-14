@@ -14,7 +14,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -40,12 +40,17 @@ public class MainActivity extends AppCompatActivity {
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(fm.getBackStackEntryCount() == 0) {
-                    CreateChildFragment createChildFragment = new CreateChildFragment();
-                    FragmentTransaction ft = fm.beginTransaction();
-                    ft.add(R.id.fragment_container, createChildFragment);
-                    ft.addToBackStack("createChildFragment");
-                    ft.commit();
+                if(findViewById(R.id.fragment_container) != null) {
+
+                    if(savedInstanceState != null){
+                        return;
+                    }
+
+                        CreateChildFragment createChildFragment = new CreateChildFragment();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        ft.add(R.id.fragment_container, createChildFragment);
+                        ft.addToBackStack("createChildFragment");
+                        ft.commit();
                 }
             }
         });
