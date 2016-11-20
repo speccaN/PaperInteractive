@@ -6,10 +6,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.paper.paperinteractive.Database.DBHandler;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,6 +22,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DBHandler db = new DBHandler(this);
+
+        // Test items
+        if(db.getChildrenCount() == 0) {
+            Log.d("Insert: ", "Inserting ..");
+            db.addChild(new Child("Göte Börjesson", 5));
+            db.addChild(new Child("Anders Andersson", 4));
+        }
+
+        //Read all children
+        Log.d("Reading: ", "Reading all children..");
+        List<Child> children = db.getAllChildren();
+
+        for(Child child : children){
+            String log = "Id: " + child.getId() + " ,Name: " + child.getName() + " ,Age: " + child.getAge();
+            // write children to log
+            Log.d("Child: : ", log);
+        }
 
         Button btn1 = (Button) findViewById(R.id.btnLibrary);
         Button btn2 = (Button) findViewById(R.id.btnMeeting);
@@ -46,11 +70,11 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
-                        CreateChildFragment createChildFragment = new CreateChildFragment();
-                        FragmentTransaction ft = fm.beginTransaction();
-                        ft.add(R.id.fragment_container, createChildFragment);
-                        ft.addToBackStack("createChildFragment");
-                        ft.commit();
+                    CreateChildFragment childFragment = new CreateChildFragment();
+                    FragmentTransaction ft = fm.beginTransaction();
+                    ft.replace(R.id.createChildFragment, childFragment);
+                    ft.addToBackStack("childFragment");
+                    ft.commit();
                 }
             }
         });

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minHeight="25px"
     android:minWidth="25px"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/main_window">
 
     <TextView
         android:id="@+id/textHeader"
@@ -57,4 +59,12 @@
         android:layout_marginBottom="69.5dp"
         android:minHeight="25px"
         android:minWidth="25px" />
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/createChildFragment"
+        android:name="com.example.paper.paperinteractive.CreateChildFragment"
+        tools:layout="@layout/fragment_create_child" />
+
 </LinearLayout>
