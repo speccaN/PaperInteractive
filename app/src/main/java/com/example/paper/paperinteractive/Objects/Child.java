@@ -1,30 +1,26 @@
-package com.example.paper.paperinteractive;
-
-/**
- * Created by Eric on 2016-11-18.
- */
+package com.example.paper.paperinteractive.Objects;
 
 public class Child {
 
-    private int _id, _age;
-    private String _name;
+    private int _id;
+    private String _name, _age;
 
     // Parameter-less constructor
     public Child(){
 
     }
 
-    public Child(String name, int age){
+    public Child(String name, String age){
         this._name = name;
         this._age = age;
     }
 
-    public Child(int id, String name, int age) {
+    public Child(int id, String name, String age) {
         this(name, age);
         this._id = id;
     }
 
-    public int getAge() {
+    public String getAge() {
         return _age;
     }
 
@@ -40,7 +36,7 @@ public class Child {
         this._name = name;
     }
 
-    public void setAge(int age) {
+    public void setAge(String age) {
         this._age = age;
     }
 

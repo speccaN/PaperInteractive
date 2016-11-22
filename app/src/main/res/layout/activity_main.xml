@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minHeight="25px"
-    android:minWidth="25px"
+    android:minHeight="25dp"
+    android:minWidth="25dp"
     android:orientation="vertical"
     android:id="@+id/main_window">
 
@@ -26,45 +25,36 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Övningsbank" />
+            android:text="@string/vningsbank" />
 
         <Button
             android:id="@+id/btnMeeting"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Nytt Besök" />
+            android:text="@string/nytt_bes_k" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="25px"
-        android:minWidth="25px"
-        android:orientation="horizontal">
+        android:minHeight="25dp"
+        android:minWidth="25dp"
+        android:orientation="vertical">
+
+        <Button
+            android:text="@string/barn_lista"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnChildList" />
 
         <Button
             android:id="@+id/btnNewChild"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:minHeight="250px"
-            android:text="Nytt Barn" />
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:text="@string/nytt_barn" />
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="69.5dp"
-        android:minHeight="25px"
-        android:minWidth="25px" />
-
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/createChildFragment"
-        android:name="com.example.paper.paperinteractive.CreateChildFragment"
-        tools:layout="@layout/fragment_create_child" />
 
 </LinearLayout>

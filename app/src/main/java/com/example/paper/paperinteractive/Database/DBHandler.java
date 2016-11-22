@@ -6,15 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.paper.paperinteractive.Child;
+import com.example.paper.paperinteractive.Objects.Child;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * Created by Eric on 2016-11-18.
- */
 
 public class DBHandler extends SQLiteOpenHelper {
 
@@ -40,7 +36,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CHILDREN_TABLE = "CREATE TABLE " + TABLE_CHILDREN + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
-                + KEY_AGE + " INTEGER" + ")";
+                + KEY_AGE + " TEXT" + ")";
         db.execSQL(CREATE_CHILDREN_TABLE);
     }
 
@@ -72,15 +68,17 @@ public class DBHandler extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
         Child child = new Child(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1), Integer.parseInt(cursor.getString(2)));
+                cursor.getString(1), cursor.getString(2));
+
+        cursor.close();
 
         // Return Child
         return child;
     }
 
     // Get all Children in Database
-    public List<Child> getAllChildren() {
-        List<Child> childList = new ArrayList<Child>();
+    public ArrayList<Child> getAllChildren() {
+        ArrayList<Child> childList = new ArrayList<Child>();
 
         // Select all Query
         String selectQuery = "SELECT * FROM " + TABLE_CHILDREN;
@@ -93,12 +91,14 @@ public class DBHandler extends SQLiteOpenHelper {
                 Child child = new Child();
                 child.setId(Integer.parseInt(cursor.getString(0)));
                 child.setName(cursor.getString(1));
-                child.setAge(Integer.parseInt(cursor.getString(2)));
+                child.setAge(cursor.getString(2));
 
                 //Add to the Child list
                 childList.add(child);
             } while (cursor.moveToNext());
         }
+
+        cursor.close();
 
         // Return Child list
         return childList;
