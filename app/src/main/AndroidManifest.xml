@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.paper.paperinteractive">
 
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,6 +21,9 @@
         <activity android:name=".MeetingActivity" />
         <activity android:name=".ChildActivity" />
         <activity android:name=".ChildListActivity" />
+        <activity android:name=".ChildListItemActivity"></activity>
+        <activity android:name=".ExerciseBankActivity"/>
+        <activity android:name=".ListViewLoader"/>
     </application>
 
 </manifest>

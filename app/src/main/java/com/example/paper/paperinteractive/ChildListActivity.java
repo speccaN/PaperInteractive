@@ -1,5 +1,6 @@
 package com.example.paper.paperinteractive;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -70,6 +71,15 @@ public class ChildListActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         Toast.makeText(getApplicationContext(), "Clicked: " + getPosition(),
                                 Toast.LENGTH_SHORT).show();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("EXTRA_CHILD", mDataset.get(getAdapterPosition()));
+
+                        Intent intent = new Intent(getApplicationContext(),
+                                ChildListItemActivity.class);
+                        intent.setClass(getApplicationContext(), ChildListItemActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
                     }
                 });
 

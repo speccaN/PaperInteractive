@@ -1,6 +1,8 @@
 package com.example.paper.paperinteractive.Objects;
 
-public class Child {
+import java.io.Serializable;
+
+public class Child implements Serializable {
 
     private int _id;
     private String _name, _age;
