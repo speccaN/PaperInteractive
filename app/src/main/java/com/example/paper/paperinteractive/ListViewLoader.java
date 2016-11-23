@@ -15,6 +15,14 @@ import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.FrameLayout.LayoutParams;
 
+/*
+https://github.com/grennis/ExpandableRecyclerView/tree/master/app/src/main/java/com/innodroid/expandablerecyclerdemo
+http://innodroid.com/blog/post/recycler-view-with-expandable-items
+https://developer.android.com/reference/android/widget/SimpleCursorTreeAdapter.html
+https://developer.android.com/reference/android/widget/ExpandableListView.html
+ */
+
+
 public class ListViewLoader extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     // This is the Adapter being used to display the list's data

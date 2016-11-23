@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.example.paper.paperinteractive.Database.DBHandler;
@@ -114,10 +115,6 @@ public class MainActivity extends AppCompatActivity {
         btnLibrary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
-
-
                 Intent intent = new Intent(getApplicationContext(), ListViewLoader.class);
                 intent.setClass(getApplicationContext(), ListViewLoader.class);
                 startActivity(intent);
