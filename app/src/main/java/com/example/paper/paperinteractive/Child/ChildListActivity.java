@@ -1,4 +1,4 @@
-package com.example.paper.paperinteractive;
+package com.example.paper.paperinteractive.Child;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +13,9 @@ import android.widget.Toast;
 
 import com.example.paper.paperinteractive.Database.DBHandler;
 import com.example.paper.paperinteractive.Objects.Child;
+import com.example.paper.paperinteractive.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ChildListActivity extends AppCompatActivity {
 
@@ -97,7 +97,7 @@ public class ChildListActivity extends AppCompatActivity {
                                                        int viewType) {
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.my_text_view, parent, false);
+                    .inflate(R.layout.child_item, parent, false);
             // set the view's size, margins, paddings and layout parameters
             v.findViewById(R.id.textName);
             v.setPadding(10, 10, 10, 10);

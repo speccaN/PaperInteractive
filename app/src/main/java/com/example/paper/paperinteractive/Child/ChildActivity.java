@@ -1,4 +1,4 @@
-package com.example.paper.paperinteractive;
+package com.example.paper.paperinteractive.Child;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import android.widget.Spinner;
 
 import com.example.paper.paperinteractive.Database.DBHandler;
 import com.example.paper.paperinteractive.Objects.Child;
+import com.example.paper.paperinteractive.R;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

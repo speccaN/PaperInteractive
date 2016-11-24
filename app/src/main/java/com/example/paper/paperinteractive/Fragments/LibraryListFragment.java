@@ -7,20 +7,18 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.example.paper.paperinteractive.Child.ChildListItemActivity;
 import com.example.paper.paperinteractive.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ChildListItemFragment.OnFragmentInteractionListener} interface
+ * {@link LibraryListFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ChildListItemFragment#newInstance} factory method to
+ * Use the {@link LibraryListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChildListItemFragment extends Fragment {
+public class LibraryListFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, child.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -32,7 +30,7 @@ public class ChildListItemFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public ChildListItemFragment() {
+    public LibraryListFragment() {
         // Required empty public constructor
     }
 
@@ -42,11 +40,11 @@ public class ChildListItemFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ChildListItemFragment.
+     * @return A new instance of fragment LibraryListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChildListItemFragment newInstance(String param1, String param2) {
-        ChildListItemFragment fragment = new ChildListItemFragment();
+    public static LibraryListFragment newInstance(String param1, String param2) {
+        LibraryListFragment fragment = new LibraryListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -67,16 +65,7 @@ public class ChildListItemFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_child_list_item, container, false);
-
-        ChildListItemActivity parentActivity = (ChildListItemActivity) getActivity();
-
-        TextView childName = (TextView) view.findViewById(R.id.textChildName);
-        TextView childAge = (TextView) view.findViewById(R.id.textChildAge);
-        childName.setText(parentActivity.child.getName());
-        childAge.setText("Ålder: " + parentActivity.child.getAge());
-
-        return view;
+        return inflater.inflate(R.layout.fragment_library_list, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

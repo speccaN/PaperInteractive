@@ -2,8 +2,6 @@ package com.example.paper.paperinteractive;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,14 +10,15 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import com.example.paper.paperinteractive.Child.ChildActivity;
+import com.example.paper.paperinteractive.Child.ChildListActivity;
 import com.example.paper.paperinteractive.Database.DBHandler;
+import com.example.paper.paperinteractive.Library.LibraryActivity;
 import com.example.paper.paperinteractive.Objects.Child;
 
 import java.util.List;
-import java.util.jar.Manifest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -115,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
         btnLibrary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ListViewLoader.class);
-                intent.setClass(getApplicationContext(), ListViewLoader.class);
+                Intent intent = new Intent(getApplicationContext(), LibraryActivity.class);
+                intent.setClass(getApplicationContext(), LibraryActivity.class);
                 startActivity(intent);
             }
         });

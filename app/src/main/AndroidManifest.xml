@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.paper.paperinteractive">
 
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
-    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+    <!-- To access Google+ APIs: -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -19,11 +22,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".MeetingActivity" />
-        <activity android:name=".ChildActivity" />
-        <activity android:name=".ChildListActivity" />
-        <activity android:name=".ChildListItemActivity"></activity>
-        <activity android:name=".ExerciseBankActivity"/>
-        <activity android:name=".ListViewLoader"/>
+        <activity android:name=".Child.ChildActivity" />
+        <activity android:name=".Child.ChildListActivity" />
+        <activity android:name=".Child.ChildListItemActivity" />
+        <activity android:name=".ListViewLoader" />
+        <activity android:name=".Library.LibraryActivity" />
     </application>
 
 </manifest>
