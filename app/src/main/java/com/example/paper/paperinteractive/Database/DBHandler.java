@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.paper.paperinteractive.Objects.Child;
+import com.example.paper.paperinteractive.Objects.LibraryChild;
+import com.example.paper.paperinteractive.Objects.LibraryGroup;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,32 +25,59 @@ public class DBHandler extends SQLiteOpenHelper {
     //Children table name
     private static final String TABLE_CHILDREN = "children";
 
+    //Library Groups table name
+    private static final String TABLE_LIBRARY_GROUPS = "groups";
+
+    //Library Groups Children table name
+    private static final String TABLE_LIBRARY_CHILDREN = "library_children";
+
     //Children Table Columns names
-    private static final String KEY_ID = "id";
+    private static final String KEY_ID = "child_id";
     private static final String KEY_NAME = "name";
     private static final String KEY_AGE = "age";
 
-    public DBHandler(Context context){
+    //Library Groups Columns names
+    private static final String KEY_GROUP_ID = "group_id";
+    private static final String KEY_GROUP_NAME = "group_name";
+
+    //Library Library Groups Children names
+    private static final String KEY_LIBRARY_CHILDREN_ID = "library_child_id";
+    private static final String KEY_LIBRARY_CHILD_NAME = "child_name";
+
+    public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL("PRAGMA foreign_keys=ON");
         String CREATE_CHILDREN_TABLE = "CREATE TABLE " + TABLE_CHILDREN + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
                 + KEY_AGE + " TEXT" + ")";
+
+        String CREATE_LIBRARY_GROUPS_TABLE = "CREATE TABLE " + TABLE_LIBRARY_GROUPS + "("
+                + KEY_GROUP_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NAME + " TEXT" + ")";
+
+        String CREATE_LIBRARY_GROUPS_CHILD_TABLE = "CREATE TABLE " + TABLE_LIBRARY_CHILDREN + "("
+                + KEY_LIBRARY_CHILDREN_ID + " INTEGER PRIMARY KEY," + KEY_LIBRARY_CHILD_NAME + " TEXT," +
+                "library_group_id INTEGER NOT NULL," +
+                "FOREIGN KEY (library_group_id) REFERENCES " + TABLE_LIBRARY_GROUPS +
+                "(" + KEY_GROUP_ID + "))";
+        db.execSQL(CREATE_LIBRARY_GROUPS_TABLE);
         db.execSQL(CREATE_CHILDREN_TABLE);
+        db.execSQL(CREATE_LIBRARY_GROUPS_CHILD_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //Drop older table if one exist
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILDREN);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIBRARY_GROUPS);
         //Create tables again
         onCreate(db);
     }
 
-    public void addChild(Child child){
+    public void addChild(Child child) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, child.getName());
@@ -60,11 +89,11 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     // Get specific child
-    public Child getChild(int id){
+    public Child getChild(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_CHILDREN, new String[] {KEY_ID, KEY_NAME, KEY_AGE}, KEY_ID + "=?",
+        Cursor cursor = db.query(TABLE_CHILDREN, new String[]{KEY_ID, KEY_NAME, KEY_AGE}, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
-        if(cursor != null){
+        if (cursor != null) {
             cursor.moveToFirst();
         }
         Child child = new Child(Integer.parseInt(cursor.getString(0)),
@@ -86,7 +115,7 @@ public class DBHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // Loop through all rows and add to the list
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             do {
                 Child child = new Child();
                 child.setId(Integer.parseInt(cursor.getString(0)));
@@ -99,26 +128,28 @@ public class DBHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         // Return Child list
         return childList;
     }
 
     // Get Children count
-    public int getChildrenCount(){
+    public int getChildrenCount() {
         String countQuery = "SELECT * FROM " + TABLE_CHILDREN;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
 
         int count = cursor.getCount();
         cursor.close();
+        db.close();
 
         //Return count
         return count;
     }
 
     // Update a Child
-    public int updateChild(Child child){
+    public int updateChild(Child child) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, child.getName());
@@ -130,15 +161,100 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     //Delete Child
-    public void deleteChild(Child child){
+    public void deleteChild(Child child) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_CHILDREN, KEY_ID + " = ?",
                 new String[]{String.valueOf(child.getId())});
         db.close();
     }
 
-    private boolean checkDataBaseExist(Context context, String dbName){
+    private boolean checkDataBaseExist(Context context, String dbName) {
         File dbFile = context.getDatabasePath(dbName);
         return dbFile.exists();
+    }
+
+    public int getLibraryGroupCount() {
+        String countQuery = "SELECT * FROM " + TABLE_LIBRARY_GROUPS;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+
+        int count = cursor.getCount();
+        cursor.close();
+
+        //Return count
+        return count;
+    }
+
+    public void addGroup(LibraryGroup group) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_GROUP_NAME, group.getGroupName());
+
+        //Insert Row
+        db.insert(TABLE_LIBRARY_GROUPS, null, values);
+        db.close(); // Close database connection
+    }
+
+    public Cursor getAllGroups() {
+        // Select all Query
+        String selectQuery = "SELECT group_name FROM " + TABLE_LIBRARY_GROUPS;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // Return Group Cursor
+        return cursor;
+    }
+
+    public Cursor fetchGroup() {
+        String query = "SELECT * FROM " + TABLE_LIBRARY_GROUPS;
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(query, null);
+    }
+
+    public Cursor fetchChildren(String libraryChild) {
+        String query = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN + " WHERE " + KEY_GROUP_ID + " = " +
+                "'" + libraryChild + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(query, null);
+    }
+
+    public void addGroupChild(LibraryChild groupChild) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_LIBRARY_CHILD_NAME, groupChild.getName());
+        values.put("library_group_id", groupChild.getGroupId());
+
+        //Insert Row
+        db.insert(TABLE_LIBRARY_CHILDREN, null, values);
+        db.close(); // Close database connection
+    }
+
+    public LibraryGroup getLibraryGroup(String group) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        LibraryGroup lGroup = new LibraryGroup();
+        String query = "SELECT * FROM " + TABLE_LIBRARY_GROUPS + " WHERE " + KEY_GROUP_NAME + " = " +
+                "'" + group + "'";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                lGroup.setId(Integer.parseInt(cursor.getString(0)));
+                lGroup.setName(cursor.getString(1));
+
+            } while (cursor.moveToNext());
+        }
+        return lGroup;
+    }
+
+    public int getLibraryGroupId(String groupName){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT group_id FROM " + TABLE_LIBRARY_GROUPS + " WHERE " + KEY_GROUP_NAME + " = " +
+                "'" + groupName + "'";
+        Cursor c = db.rawQuery(query, null);
+        if (c != null)
+            c.moveToFirst();
+        int i = Integer.parseInt(c.getString(0));
+        c.close();
+
+        return i;
     }
 }

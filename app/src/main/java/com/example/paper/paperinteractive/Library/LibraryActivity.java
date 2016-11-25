@@ -2,8 +2,11 @@ package com.example.paper.paperinteractive.Library;
 
 import android.app.ExpandableListActivity;
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
@@ -16,81 +19,156 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class LibraryActivity extends ExpandableListActivity {
+public class LibraryActivity extends ExpandableListActivity implements ExpandableListAdapter {
 
     private ExpandableListView mExpandableListView;
     private ExpandableListAdapter mAdapter;
 
-    private List<HashMap<String, String>> groupData;
-    //private List<HashMap<String, String>> childData;
+    private List<HashMap<String, String>> groupData = new ArrayList<>(); // List of Group Maps
+    private List<List<Map<String, String>>> listOfChildGroups = new ArrayList<>();
+
+    List<HashMap<String, String>> childData;
+    HashMap<String, String> groups;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library);
 
-        HashMap<String, String> groups = new HashMap<String, String>();
-        groupData = new ArrayList<>();
-        groupData.add(groups);
+        groupData.add(new HashMap<String, String>() {{
+            put("ROOT_NAME", "Group1");
+        }});
+        groupData.add(new HashMap<String, String>(){{
+            put("ROOT_NAME", "Group2");
+        }});
+        groupData.add(new HashMap<String, String>(){{
+            put("ROOT_NAME", "Group3");
+        }});
 
+        List<Map<String, String>> childGroupForFirstGroupRow = new ArrayList<Map<String, String>>(){{
+            add(new HashMap<String, String>() {{
+                put("CHILD_NAME", "child in group 1");
+            }});
+        }};
+        listOfChildGroups.add(childGroupForFirstGroupRow);
 
-        groups.put("G1", "Group1");
-        groups.put("G2", "Group2");
-        groups.put("G3", "Group3");
-
-        List<List<HashMap<String, String>>> children = new ArrayList<>();
-        List<HashMap<String, String>> childData = new ArrayList<>();
-
-        children.add(groupData);
-        HashMap<String, String> childrenMap = new HashMap<>();
-        childrenMap.put("C1", "Child1");
-        childrenMap.put("C2", "Child2");
-
-        childData.add(childrenMap);
-
-
-
-       /* List<String> group1 = new ArrayList<>();
-        List<String> group2 = new ArrayList<>();
-        List<String> group3 = new ArrayList<>();
-
-        List<String> child1 = new ArrayList<>();
-        child1.add("C1");
-        child1.add("C2");
-
-        List<String> child2 = new ArrayList<>();
-        child2.add("C1");
-        child2.add("C2");
-
-        List<String> child3 = new ArrayList<>();
-        child3.add("C1");
-        child3.add("C2");
-
-        groupData = new HashMap<>();
-        groupData.put("Group1", group1);
-        groupData.put("Group2", group2);
-        groupData.put("Group3", group3);
-
-        childData = new HashMap<>();
-        childData.put("Child1", child1);
-        childData.put("Child2", child2);
-        childData.put("Child3", child3);*/
+        List<Map<String, String>> childGroupForSecondGroupRow = new ArrayList<Map<String, String>>(){{
+            add(new HashMap<String, String>(){{
+                put("CHILD_NAME", "child in group 2");
+            }});
+        }};
+        listOfChildGroups.add(childGroupForSecondGroupRow);
 
         mExpandableListView = getExpandableListView();
 
-        String[] gKeyArray = groups.keySet().toArray(new String[groups.size()]);
-        String[] cKeyArray = childrenMap.keySet().toArray(new String[children.size()]);
+        mAdapter = new MyAdapter(
+                this,
 
+                groupData,
+                android.R.layout.simple_expandable_list_item_1,
+                new String[]{"ROOT_NAME"},
+                new int[] {android.R.id.text1},
 
-        mAdapter = new MyAdapter(this, groupData, android.R.layout.simple_expandable_list_item_1,
-                gKeyArray,
-                new int[] {android.R.id.text1, android.R.id.text2}, children,
-                android.R.layout.simple_expandable_list_item_2, cKeyArray,
+                listOfChildGroups,
+                android.R.layout.simple_expandable_list_item_2,
+                new String[]{"CHILD_NAME", "CHILD_NAME"},
                 new int[]{android.R.id.text1, android.R.id.text2});
 
         mExpandableListView.setAdapter(mAdapter);
 
 
+    }
+
+    @Override
+    public void registerDataSetObserver(DataSetObserver dataSetObserver) {
+
+    }
+
+    @Override
+    public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
+
+    }
+
+    @Override
+    public int getGroupCount() {
+        return groups.size();
+    }
+
+    @Override
+    public int getChildrenCount(int i) {
+        return childData.get(i).size();
+    }
+
+    @Override
+    public Object getGroup(int i) {
+        return null;
+    }
+
+    @Override
+    public Object getChild(int i, int i1) {
+        return null;
+    }
+
+    @Override
+    public long getGroupId(int i) {
+        return 0;
+    }
+
+    @Override
+    public long getChildId(int i, int i1) {
+        return 0;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
+        return null;
+    }
+
+    @Override
+    public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
+        return null;
+    }
+
+    @Override
+    public boolean isChildSelectable(int i, int i1) {
+        return false;
+    }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public void onGroupExpanded(int i) {
+
+    }
+
+    @Override
+    public void onGroupCollapsed(int i) {
+
+    }
+
+    @Override
+    public long getCombinedChildId(long l, long l1) {
+        return 0;
+    }
+
+    @Override
+    public long getCombinedGroupId(long l) {
+        return 0;
     }
 
     public class MyAdapter extends SimpleExpandableListAdapter{
@@ -101,6 +179,7 @@ public class LibraryActivity extends ExpandableListActivity {
                          String[] groupFrom, int[] groupTo,
                          List<? extends List<? extends Map<String, ?>>> childData,
                          int childLayout, String[] childFrom, int[] childTo) {
+
             super(context, groupData, groupLayout, groupFrom, groupTo,
                     childData, childLayout, childFrom, childTo);
 

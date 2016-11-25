@@ -16,7 +16,10 @@ import com.example.paper.paperinteractive.Child.ChildActivity;
 import com.example.paper.paperinteractive.Child.ChildListActivity;
 import com.example.paper.paperinteractive.Database.DBHandler;
 import com.example.paper.paperinteractive.Library.LibraryActivity;
+import com.example.paper.paperinteractive.Library.LibraryDatabaseActivity;
 import com.example.paper.paperinteractive.Objects.Child;
+import com.example.paper.paperinteractive.Objects.LibraryChild;
+import com.example.paper.paperinteractive.Objects.LibraryGroup;
 
 import java.util.List;
 
@@ -73,6 +76,16 @@ public class MainActivity extends AppCompatActivity {
             db.addChild(new Child("Test Test5", String.valueOf((int)Math.ceil(Math.random() * 7))));
         }
 
+        if (db.getLibraryGroupCount() == 0){
+            Log.d("Insert: ", "Inserting Group ..");
+            db.addGroup(new LibraryGroup("Överkropp"));
+            db.addGroup(new LibraryGroup("Underkropp"));
+            db.addGroup(new LibraryGroup("Ben"));
+
+            db.addGroupChild(new LibraryChild(db.getLibraryGroupId("Överkropp"), "Övning1"));
+            db.addGroupChild(new LibraryChild(db.getLibraryGroupId("Ben"), "Övning3"));
+        }
+
         //Read all children
         Log.d("Reading: ", "Reading all children..");
         List<Child> children = db.getAllChildren();
@@ -114,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
         btnLibrary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), LibraryActivity.class);
-                intent.setClass(getApplicationContext(), LibraryActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LibraryDatabaseActivity.class);
+                intent.setClass(getApplicationContext(), LibraryDatabaseActivity.class);
                 startActivity(intent);
             }
         });
