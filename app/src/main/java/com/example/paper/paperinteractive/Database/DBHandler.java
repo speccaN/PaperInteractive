@@ -32,16 +32,16 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String TABLE_LIBRARY_CHILDREN = "library_children";
 
     //Children Table Columns names
-    private static final String KEY_ID = "child_id";
+    private static final String KEY_ID = "_id";
     private static final String KEY_NAME = "name";
     private static final String KEY_AGE = "age";
 
     //Library Groups Columns names
-    private static final String KEY_GROUP_ID = "group_id";
+    private static final String KEY_GROUP_ID = "_id";
     private static final String KEY_GROUP_NAME = "group_name";
 
     //Library Library Groups Children names
-    private static final String KEY_LIBRARY_CHILDREN_ID = "library_child_id";
+    private static final String KEY_LIBRARY_CHILDREN_ID = "_id";
     private static final String KEY_LIBRARY_CHILD_NAME = "child_name";
 
     public DBHandler(Context context) {
@@ -197,7 +197,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public Cursor getAllGroups() {
         // Select all Query
-        String selectQuery = "SELECT group_name FROM " + TABLE_LIBRARY_GROUPS;
+        String selectQuery = "SELECT * FROM " + TABLE_LIBRARY_GROUPS;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -229,6 +229,17 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close(); // Close database connection
     }
 
+    public Cursor getAllGroupChildren(int id){
+        // Select all Query
+        String selectQuery = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN +
+                " WHERE library_group_id = " + "'" + id + "'";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // Return Group Cursor
+        return cursor;
+    }
+
     public LibraryGroup getLibraryGroup(String group) {
         SQLiteDatabase db = this.getReadableDatabase();
         LibraryGroup lGroup = new LibraryGroup();
@@ -247,7 +258,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public int getLibraryGroupId(String groupName){
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT group_id FROM " + TABLE_LIBRARY_GROUPS + " WHERE " + KEY_GROUP_NAME + " = " +
+        String query = "SELECT " + KEY_GROUP_ID + " FROM " + TABLE_LIBRARY_GROUPS + " WHERE "
+                + KEY_GROUP_NAME + " = " +
                 "'" + groupName + "'";
         Cursor c = db.rawQuery(query, null);
         if (c != null)
@@ -256,5 +268,16 @@ public class DBHandler extends SQLiteOpenHelper {
         c.close();
 
         return i;
+    }
+
+    public Cursor getMatchingGroupAndChild(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT group_name, _id, library_child_id, child_name FROM " +
+                TABLE_LIBRARY_CHILDREN + " INNER JOIN " + TABLE_LIBRARY_GROUPS +
+                " ON library_children.library_group_id = groups._id";
+
+        Cursor c = db.rawQuery(query, null);
+
+        return c;
     }
 }

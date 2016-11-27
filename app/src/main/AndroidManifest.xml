@@ -27,7 +27,7 @@
         <activity android:name=".Child.ChildListItemActivity" />
         <activity android:name=".ListViewLoader" />
         <activity android:name=".Library.LibraryActivity" />
-        <activity android:name=".Library.LibraryDatabaseActivity"></activity>
+        <activity android:name=".Library.LibraryDatabaseActivity" />
     </application>
 
 </manifest>

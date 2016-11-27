@@ -7,22 +7,24 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.EditText;
 
-import com.example.paper.paperinteractive.Child.ChildListItemActivity;
+import com.example.paper.paperinteractive.Database.DBHandler;
+import com.example.paper.paperinteractive.Objects.LibraryChild;
 import com.example.paper.paperinteractive.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ChildListItemFragment.OnFragmentInteractionListener} interface
+ * {@link OnChildAdded} interface
  * to handle interaction events.
- * Use the {@link ChildListItemFragment#newInstance} factory method to
+ * Use the {@link LibraryAddChildFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChildListItemFragment extends Fragment {
+public class LibraryAddChildFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, child.g. ARG_ITEM_NUMBER
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -30,9 +32,11 @@ public class ChildListItemFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    DBHandler dbHandler;
 
-    public ChildListItemFragment() {
+    private OnChildAdded mListener;
+
+    public LibraryAddChildFragment() {
         // Required empty public constructor
     }
 
@@ -42,11 +46,11 @@ public class ChildListItemFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ChildListItemFragment.
+     * @return A new instance of fragment LibraryAddChildFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChildListItemFragment newInstance(String param1, String param2) {
-        ChildListItemFragment fragment = new ChildListItemFragment();
+    public static LibraryAddChildFragment newInstance(String param1, String param2) {
+        LibraryAddChildFragment fragment = new LibraryAddChildFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -67,14 +71,23 @@ public class ChildListItemFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_child_list_item, container, false);
+        View view = inflater.inflate(R.layout.fragment_library_add_child, container, false);
 
-        ChildListItemActivity parentActivity = (ChildListItemActivity) getActivity();
+        dbHandler = new DBHandler(getContext());
+        final EditText childText = (EditText) view.findViewById(R.id.textAddChild);
+        Button btnAddChild = (Button) view.findViewById(R.id.btnAddChild);
 
-        TextView childName = (TextView) view.findViewById(R.id.textChildName);
-        TextView childAge = (TextView) view.findViewById(R.id.textChildAge);
-        childName.setText(parentActivity.child.getName());
-        childAge.setText("Ålder: " + parentActivity.child.getAge());
+        Bundle bundle = new Bundle();
+        bundle = getArguments();
+        final String grpName = bundle.getString("GROUP_NAME");
+
+        btnAddChild.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LibraryChild lbChild = new LibraryChild(dbHandler.getLibraryGroupId(grpName), childText.getText().toString());
+                dbHandler.addGroupChild(lbChild);
+            }
+        });
 
         return view;
     }
@@ -82,15 +95,15 @@ public class ChildListItemFragment extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onChildAdded();
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnChildAdded) {
+            mListener = (OnChildAdded) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnGroupAddedListener");
@@ -113,8 +126,8 @@ public class ChildListItemFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnChildAdded {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onChildAdded();
     }
 }
