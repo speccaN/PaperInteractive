@@ -77,18 +77,20 @@ public class LibraryAddChildFragment extends Fragment {
         final EditText childText = (EditText) view.findViewById(R.id.textAddChild);
         Button btnAddChild = (Button) view.findViewById(R.id.btnAddChild);
 
-        Bundle bundle = new Bundle();
-        bundle = getArguments();
-        final String grpName = bundle.getString("GROUP_NAME");
-
         btnAddChild.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LibraryChild lbChild = new LibraryChild(grpName,
-                        childText.getText().toString());
-                LibraryAddGroupActivity lbAG = (LibraryAddGroupActivity) getActivity();
-                lbAG.tempGroup.getList().add(lbChild);
-                mListener.onChildAdded();
+                if (((LibraryAddGroupActivity) getActivity()).groupTitle.getText().toString() != "") {
+                    String grpName = ((LibraryAddGroupActivity) getActivity())
+                            .groupTitle.getText().toString();
+
+                    LibraryChild lbChild = new LibraryChild(grpName,
+                            childText.getText().toString());
+                    ((LibraryAddGroupActivity) getActivity())
+                            .tempGroup.getList().add(lbChild);
+                    mListener.onChildAdded();
+                }
+                return;
             }
         });
 

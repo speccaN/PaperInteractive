@@ -76,12 +76,6 @@ public class LibraryAddGroupFragment extends Fragment {
                 InputMethodManager imm = (InputMethodManager)
                         getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-                Intent intent = new Intent(getContext(), LibraryAddGroupActivity.class);
-                intent.putExtra("GROUP_NAME", groupName.getText().toString());
-
-                if(intent.resolveActivity(getActivity().getPackageManager()) != null)
-                    startActivity(intent);
             }
         });
 

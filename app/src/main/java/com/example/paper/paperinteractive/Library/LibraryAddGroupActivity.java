@@ -32,25 +32,19 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
     List<LibraryChild> mDataset;
     RecyclerView.LayoutManager layoutManager;
 
-    EditText groupTitle;
+    public EditText groupTitle;
     TextView emptyText;
 
     public LibraryGroup tempGroup;
-
-    private OnGroupAddedListener mListener;
-
-    public interface OnGroupAddedListener{
-        void onGroupAdded();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_add_group);
 
-        Intent intent = getIntent();
-
         emptyText = (TextView) findViewById(R.id.text_empty_recycler);
+
+        tempGroup = new LibraryGroup();
 
         Button addGroupButton = (Button) findViewById(R.id.btnAddGroup);
 
@@ -59,9 +53,12 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
         recyclerView.setLayoutManager(layoutManager);
 
         groupTitle = (EditText) findViewById(R.id.textGroupName);
-
-        groupTitle.setText(intent.getStringExtra("GROUP_NAME"));
-        tempGroup = new LibraryGroup(intent.getStringExtra("GROUP_NAME"));
+        groupTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                tempGroup.setName(groupTitle.getText().toString());
+            }
+        });
 
         adapter = new MyAdapter();
         recyclerView.setAdapter(adapter);
@@ -71,9 +68,6 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Fragment addChildFragment = new LibraryAddChildFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("GROUP_NAME", groupTitle.getText().toString());
-        addChildFragment.setArguments(bundle);
         fragmentTransaction.add(R.id.child_fragment_container, addChildFragment);
         fragmentTransaction.commit();
 
@@ -85,7 +79,9 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
                 for(LibraryChild child : tempGroup.getList()){
                     db.addGroupChild(child);
                 }
-
+                Intent returnIntent = new Intent();
+                setResult(RESULT_OK, returnIntent);
+                finish();
             }
         });
     }

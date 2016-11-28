@@ -7,7 +7,7 @@ public class LibraryGroup {
 
     private String mGroupName;
     private int mId;
-    private List<LibraryChild> mChildren;
+    private List<LibraryChild> mChildren = new ArrayList<>();
 
 
     public LibraryGroup() {
@@ -16,7 +16,6 @@ public class LibraryGroup {
 
     public LibraryGroup(String groupName) {
         mGroupName = groupName;
-        mChildren = new ArrayList<>();
     }
 
     public LibraryGroup(int id, String groupName){

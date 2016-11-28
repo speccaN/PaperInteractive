@@ -4,6 +4,7 @@ import android.app.ExpandableListActivity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,8 @@ import com.example.paper.paperinteractive.Database.DBHandler;
 import com.example.paper.paperinteractive.Fragments.LibraryAddGroupFragment;
 import com.example.paper.paperinteractive.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
+
+import static java.security.AccessController.getContext;
 
 public class LibraryDatabaseActivity extends ExpandableListActivity{
 
@@ -32,6 +35,14 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
     private View btnDelete;
     private View fab_toolbar;
     private boolean isExpanded = false;
+
+    int requestCode = 1;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        adapter.changeCursor(dbHandler.getAllGroups());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,12 +86,10 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                LibraryAddGroupFragment fragment = new LibraryAddGroupFragment();
-                fragmentTransaction.add(R.id.fragment_group_container, fragment);
-                fragmentTransaction.commit();
-                fab.setVisibility(View.GONE);
+
+                Intent intent = new Intent(LibraryDatabaseActivity.this,
+                        LibraryAddGroupActivity.class);
+                startActivityForResult(intent, requestCode);
             }
         });
 
@@ -110,6 +119,8 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
                 isExpanded = false;
             }
         });
+
+
     }
 
     @Override
