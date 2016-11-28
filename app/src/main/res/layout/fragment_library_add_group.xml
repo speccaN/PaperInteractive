@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/l_gg_till"
+            android:text="Lägg till Grupp"
             android:id="@+id/textLibraryGroup"
             android:textAlignment="center" />
 
@@ -39,12 +39,6 @@
                 android:layout_weight="1" />
 
         </LinearLayout>
-
-        <Button
-            android:text="Lägg till Övning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnAddChild" />
 
         <View
             android:layout_width="match_parent"

@@ -20,7 +20,6 @@ import com.example.paper.paperinteractive.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 public class LibraryDatabaseActivity extends ExpandableListActivity implements
-        LibraryAddGroupFragment.OnGroupAddedListener,
         LibraryAddChildFragment.OnChildAdded {
 
     DBHandler dbHandler;
@@ -129,11 +128,6 @@ public class LibraryDatabaseActivity extends ExpandableListActivity implements
     @Override
     public void onChildAdded() {
         adapter.notifyDataSetChanged(true);
-    }
-
-    @Override
-    public void onGroupAdded() {
-        adapter.changeCursor(dbHandler.getAllGroups());
     }
 
     public class MyAdapter extends SimpleCursorTreeAdapter{
