@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.paper.paperinteractive.Database.DBHandler;
+import com.example.paper.paperinteractive.Library.LibraryAddGroupActivity;
 import com.example.paper.paperinteractive.Objects.LibraryChild;
 import com.example.paper.paperinteractive.R;
 
@@ -73,7 +74,6 @@ public class LibraryAddChildFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_library_add_child, container, false);
 
-        dbHandler = new DBHandler(getContext());
         final EditText childText = (EditText) view.findViewById(R.id.textAddChild);
         Button btnAddChild = (Button) view.findViewById(R.id.btnAddChild);
 
@@ -84,8 +84,11 @@ public class LibraryAddChildFragment extends Fragment {
         btnAddChild.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LibraryChild lbChild = new LibraryChild(dbHandler.getLibraryGroupId(grpName), childText.getText().toString());
-                dbHandler.addGroupChild(lbChild);
+                LibraryChild lbChild = new LibraryChild(grpName,
+                        childText.getText().toString());
+                LibraryAddGroupActivity lbAG = (LibraryAddGroupActivity) getActivity();
+                lbAG.tempGroup.getList().add(lbChild);
+                mListener.onChildAdded();
             }
         });
 
@@ -106,7 +109,7 @@ public class LibraryAddChildFragment extends Fragment {
             mListener = (OnChildAdded) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnGroupAddedListener");
+                    + " must implement OnChildAddedListener");
         }
     }
 

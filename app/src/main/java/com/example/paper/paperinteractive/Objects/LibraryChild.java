@@ -3,9 +3,9 @@ package com.example.paper.paperinteractive.Objects;
 public class LibraryChild {
 
     int mId;
-    int groupId;
+    //int groupId;
     String name;
-    LibraryGroup groupName;
+    LibraryGroup group;
 
     //LibraryGroup group;
 
@@ -13,13 +13,13 @@ public class LibraryChild {
 
     }
 
-    public LibraryChild(int groupId, String name){
+    public LibraryChild(String groupName, String name){
         this.name = name;
-        this.groupId = groupId;
+        group = new LibraryGroup(groupName);
     }
 
-    public LibraryChild(int id, int groupId, String name){
-        this(groupId, name);
+    public LibraryChild(int id, String groupName, String name){
+        this(groupName, name);
         mId = id;
     }
 
@@ -39,7 +39,7 @@ public class LibraryChild {
         this.mId = mId;
     }
 
-    public int getGroupId() {
-        return groupId;
+    public String getGroupName() {
+        return group.getGroupName();
     }
 }

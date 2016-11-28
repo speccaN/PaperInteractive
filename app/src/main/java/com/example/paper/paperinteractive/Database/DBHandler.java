@@ -26,7 +26,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String TABLE_CHILDREN = "children";
 
     //Library Groups table name
-    private static final String TABLE_LIBRARY_GROUPS = "groups";
+    private static final String TABLE_LIBRARY_GROUPS = "library_groups";
 
     //Library Groups Children table name
     private static final String TABLE_LIBRARY_CHILDREN = "library_children";
@@ -43,6 +43,7 @@ public class DBHandler extends SQLiteOpenHelper {
     //Library Library Groups Children names
     private static final String KEY_LIBRARY_CHILDREN_ID = "_id";
     private static final String KEY_LIBRARY_CHILD_NAME = "child_name";
+    private static final String KEY_LIBRARY_CHILD_GROUP_NAME = "group_name";
 
     public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -60,8 +61,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
         String CREATE_LIBRARY_GROUPS_CHILD_TABLE = "CREATE TABLE " + TABLE_LIBRARY_CHILDREN + "("
                 + KEY_LIBRARY_CHILDREN_ID + " INTEGER PRIMARY KEY," + KEY_LIBRARY_CHILD_NAME + " TEXT," +
-                "library_group_id INTEGER NOT NULL," +
-                "FOREIGN KEY (library_group_id) REFERENCES " + TABLE_LIBRARY_GROUPS +
+                "group_id INTEGER NOT NULL," + KEY_LIBRARY_CHILD_GROUP_NAME + " TEXT," +
+                "FOREIGN KEY (group_id) REFERENCES " + TABLE_LIBRARY_GROUPS +
                 "(" + KEY_GROUP_ID + "))";
         db.execSQL(CREATE_LIBRARY_GROUPS_TABLE);
         db.execSQL(CREATE_CHILDREN_TABLE);
@@ -222,7 +223,8 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_LIBRARY_CHILD_NAME, groupChild.getName());
-        values.put("library_group_id", groupChild.getGroupId());
+        values.put("group_id", getLibraryGroupId(groupChild.getGroupName()));
+        values.put("group_name", groupChild.getGroupName());
 
         //Insert Row
         db.insert(TABLE_LIBRARY_CHILDREN, null, values);
@@ -232,7 +234,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public Cursor getAllGroupChildren(int id){
         // Select all Query
         String selectQuery = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN +
-                " WHERE library_group_id = " + "'" + id + "'";
+                " WHERE group_id = " + "'" + id + "'";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 

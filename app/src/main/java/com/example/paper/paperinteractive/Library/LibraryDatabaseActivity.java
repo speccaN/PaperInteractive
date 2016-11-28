@@ -5,7 +5,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,13 +13,11 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleCursorTreeAdapter;
 
 import com.example.paper.paperinteractive.Database.DBHandler;
-import com.example.paper.paperinteractive.Fragments.LibraryAddChildFragment;
 import com.example.paper.paperinteractive.Fragments.LibraryAddGroupFragment;
 import com.example.paper.paperinteractive.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
-public class LibraryDatabaseActivity extends ExpandableListActivity implements
-        LibraryAddChildFragment.OnChildAdded {
+public class LibraryDatabaseActivity extends ExpandableListActivity{
 
     DBHandler dbHandler;
     Cursor groupsCursor; // Cursor for list of groups (lists top nodes)
@@ -123,11 +120,6 @@ public class LibraryDatabaseActivity extends ExpandableListActivity implements
         }
         else
             super.onBackPressed();
-    }
-
-    @Override
-    public void onChildAdded() {
-        adapter.notifyDataSetChanged(true);
     }
 
     public class MyAdapter extends SimpleCursorTreeAdapter{

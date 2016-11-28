@@ -1,6 +1,9 @@
 package com.example.paper.paperinteractive.Library;
 
+import android.app.Fragment;
 import android.content.Intent;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,18 +11,37 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.paper.paperinteractive.Database.DBHandler;
+import com.example.paper.paperinteractive.Fragments.LibraryAddChildFragment;
+import com.example.paper.paperinteractive.Objects.LibraryChild;
+import com.example.paper.paperinteractive.Objects.LibraryGroup;
 import com.example.paper.paperinteractive.R;
 
-public class LibraryAddGroupActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class LibraryAddGroupActivity extends AppCompatActivity implements
+        LibraryAddChildFragment.OnChildAdded {
 
     RecyclerView recyclerView;
     RecyclerView.Adapter adapter;
+    List<LibraryChild> mDataset;
     RecyclerView.LayoutManager layoutManager;
 
     EditText groupTitle;
+    TextView emptyText;
+
+    public LibraryGroup tempGroup;
+
+    private OnGroupAddedListener mListener;
+
+    public interface OnGroupAddedListener{
+        void onGroupAdded();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +50,10 @@ public class LibraryAddGroupActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
+        emptyText = (TextView) findViewById(R.id.text_empty_recycler);
+
+        Button addGroupButton = (Button) findViewById(R.id.btnAddGroup);
+
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_group_children);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -35,18 +61,55 @@ public class LibraryAddGroupActivity extends AppCompatActivity {
         groupTitle = (EditText) findViewById(R.id.textGroupName);
 
         groupTitle.setText(intent.getStringExtra("GROUP_NAME"));
+        tempGroup = new LibraryGroup(intent.getStringExtra("GROUP_NAME"));
 
-        String[] a = new String[]{
-                "Hej", "På", "Dig"
-        };
-
-        adapter = new MyAdapter(a);
+        adapter = new MyAdapter();
         recyclerView.setAdapter(adapter);
+
+        UpdateRecyclerView();
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Fragment addChildFragment = new LibraryAddChildFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("GROUP_NAME", groupTitle.getText().toString());
+        addChildFragment.setArguments(bundle);
+        fragmentTransaction.add(R.id.child_fragment_container, addChildFragment);
+        fragmentTransaction.commit();
+
+        addGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DBHandler db = new DBHandler(getApplicationContext());
+                db.addGroup(tempGroup);
+                for(LibraryChild child : tempGroup.getList()){
+                    db.addGroupChild(child);
+                }
+
+            }
+        });
+    }
+
+    private void UpdateRecyclerView() {
+        if(adapter.getItemCount() == 0){
+            recyclerView.setVisibility(View.GONE);
+            emptyText.setText("Listan är tom! Lägg till övningar");
+        }else{
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.GONE);
+        }
+    }
+
+    // Event listener från LibraryAddChildFragment
+    @Override
+    public void onChildAdded() {
+        mDataset = tempGroup.getList();
+        adapter.notifyDataSetChanged();
+        if (recyclerView.getVisibility() == View.GONE)
+            UpdateRecyclerView();
     }
 
     private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
-
-        private String[] mDataset;
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
@@ -61,9 +124,12 @@ public class LibraryAddGroupActivity extends AppCompatActivity {
         }
 
 
-        public MyAdapter(String[] myDataset) {
+        public MyAdapter(List<LibraryChild> myDataset) {
             mDataset = myDataset;
         }
+        public MyAdapter(){mDataset = new ArrayList<>();}
+
+
 
         // Create new views (invoked by the layout manager)
         @Override
@@ -81,12 +147,12 @@ public class LibraryAddGroupActivity extends AppCompatActivity {
         public void onBindViewHolder(MyAdapter.ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            holder.mTextView.setText(mDataset[position]);
+            holder.mTextView.setText(mDataset.get(position).getName());
         }
 
         @Override
         public int getItemCount() {
-            return mDataset.length;
+            return mDataset.size();
         }
     }
 }

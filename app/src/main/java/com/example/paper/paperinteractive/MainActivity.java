@@ -82,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
             db.addGroup(new LibraryGroup("Underkropp"));
             db.addGroup(new LibraryGroup("Ben"));
 
-            db.addGroupChild(new LibraryChild(db.getLibraryGroupId("Överkropp"), "Övning1"));
-            db.addGroupChild(new LibraryChild(db.getLibraryGroupId("Ben"), "Övning3"));
+            //db.addGroupChild(new LibraryChild(db.getLibraryGroupId("Överkropp"), "Övning1"));
+            //db.addGroupChild(new LibraryChild(db.getLibraryGroupId("Ben"), "Övning3"));
         }
 
         //Read all children

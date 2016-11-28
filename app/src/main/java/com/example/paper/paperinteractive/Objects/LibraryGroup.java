@@ -1,9 +1,13 @@
 package com.example.paper.paperinteractive.Objects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LibraryGroup {
 
     private String mGroupName;
     private int mId;
+    private List<LibraryChild> mChildren;
 
 
     public LibraryGroup() {
@@ -12,6 +16,7 @@ public class LibraryGroup {
 
     public LibraryGroup(String groupName) {
         mGroupName = groupName;
+        mChildren = new ArrayList<>();
     }
 
     public LibraryGroup(int id, String groupName){
@@ -34,4 +39,6 @@ public class LibraryGroup {
     public void setId(int mId) {
         this.mId = mId;
     }
+
+    public List<LibraryChild> getList(){return mChildren;}
 }
