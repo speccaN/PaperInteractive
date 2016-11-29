@@ -30,7 +30,7 @@ public class ChildListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_child_list);
 
-        db = new DBHandler(this);
+        db = DBHandler.getInstance(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.child_recycler_view);
 

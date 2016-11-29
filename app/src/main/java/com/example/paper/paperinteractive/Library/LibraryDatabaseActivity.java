@@ -49,7 +49,7 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_database_toolbar);
 
-        dbHandler = new DBHandler(this);
+        dbHandler = DBHandler.getInstance(this);
 
         ExpandableListView expandableListView = getExpandableListView();
 

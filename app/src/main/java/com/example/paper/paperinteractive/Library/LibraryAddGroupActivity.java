@@ -86,7 +86,7 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
 
         @Override
         protected String doInBackground(Void... voids) {
-            DBHandler db = new DBHandler(getApplicationContext());
+            DBHandler db = DBHandler.getInstance(getApplicationContext());
             db.addGroup(tempGroup);
             for (LibraryChild child : tempGroup.getList()) {
                 db.addGroupChild(child);

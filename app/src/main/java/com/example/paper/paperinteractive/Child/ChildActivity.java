@@ -30,7 +30,7 @@ public class ChildActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_child);
 
-        db = new DBHandler(this);
+        db = DBHandler.getInstance(this);
 
         Button btnAdd = (Button) findViewById(R.id.btnAdd);
         final EditText child_name = (EditText) findViewById(R.id.child_name);

@@ -16,6 +16,8 @@ import java.util.List;
 
 public class DBHandler extends SQLiteOpenHelper {
 
+    private static DBHandler sInstance;
+
     //Database Version
     private static final int DATABASE_VERSION = 1;
 
@@ -45,7 +47,21 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_LIBRARY_CHILD_NAME = "child_name";
     private static final String KEY_LIBRARY_CHILD_GROUP_NAME = "group_name";
 
-    public DBHandler(Context context) {
+    public static synchronized DBHandler getInstance(Context context) {
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if(sInstance == null) {
+            sInstance = new DBHandler(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    /**
+     * Constructor should be private to prevent direct instantiation.
+     * make call to static method "getInstance()" instead.
+     */
+    private DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

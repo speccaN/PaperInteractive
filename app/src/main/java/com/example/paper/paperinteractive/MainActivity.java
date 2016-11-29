@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        db = new DBHandler(this);
+        db = DBHandler.getInstance(this);
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
