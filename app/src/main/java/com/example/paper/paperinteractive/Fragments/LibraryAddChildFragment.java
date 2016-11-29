@@ -80,7 +80,7 @@ public class LibraryAddChildFragment extends Fragment {
         btnAddChild.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (((LibraryAddGroupActivity) getActivity()).groupTitle.getText().toString() != "") {
+                if (!((LibraryAddGroupActivity) getActivity()).groupTitle.getText().toString().equals("")) {
                     String grpName = ((LibraryAddGroupActivity) getActivity())
                             .groupTitle.getText().toString();
 

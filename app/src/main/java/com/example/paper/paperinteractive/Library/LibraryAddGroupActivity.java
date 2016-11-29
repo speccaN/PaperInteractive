@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -74,16 +75,38 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
         addGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DBHandler db = new DBHandler(getApplicationContext());
-                db.addGroup(tempGroup);
-                for(LibraryChild child : tempGroup.getList()){
-                    db.addGroupChild(child);
+                if(!groupTitle.getText().toString().equals("")) {
+                    new LongOperation().execute();
                 }
-                Intent returnIntent = new Intent();
-                setResult(RESULT_OK, returnIntent);
-                finish();
             }
         });
+    }
+
+    private class LongOperation extends AsyncTask<Void, Void, String>{
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            DBHandler db = new DBHandler(getApplicationContext());
+            db.addGroup(tempGroup);
+            for (LibraryChild child : tempGroup.getList()) {
+                db.addGroupChild(child);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Intent returnIntent = new Intent();
+            setResult(RESULT_OK, returnIntent);
+            finish();
+        }
     }
 
     private void UpdateRecyclerView() {
