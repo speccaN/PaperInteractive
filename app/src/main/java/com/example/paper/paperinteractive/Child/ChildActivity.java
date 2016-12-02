@@ -65,14 +65,18 @@ public class ChildActivity extends AppCompatActivity {
             spinnerArray.add(i);
         }
 
-        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, R.layout.support_simple_spinner_dropdown_item, spinnerArray);
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this,
+                R.layout.support_simple_spinner_dropdown_item,
+                spinnerArray);
+
         spinner.setAdapter(adapter);
 
         try {
             Field popup = Spinner.class.getDeclaredField("mPopup");
             popup.setAccessible(true);
 
-            android.widget.ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(spinner);
+            android.widget.ListPopupWindow popupWindow =
+                    (android.widget.ListPopupWindow) popup.get(spinner);
 
             popupWindow.setHeight(500);
         } catch (NoClassDefFoundError | ClassCastException | NoSuchFieldException | IllegalAccessException e) {

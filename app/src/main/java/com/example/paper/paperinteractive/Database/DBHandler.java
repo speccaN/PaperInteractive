@@ -10,7 +10,6 @@ import com.example.paper.paperinteractive.Objects.Child;
 import com.example.paper.paperinteractive.Objects.LibraryChild;
 import com.example.paper.paperinteractive.Objects.LibraryGroup;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +32,9 @@ public class DBHandler extends SQLiteOpenHelper {
     //Library Groups Children table name
     private static final String TABLE_LIBRARY_CHILDREN = "library_children";
 
+    // LibraryChild + Child Table name
+    private static final String TABLE_LCC = "LCC";
+
     //Children Table Columns names
     private static final String KEY_ID = "_id";
     private static final String KEY_NAME = "name";
@@ -43,9 +45,16 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_GROUP_NAME = "group_name";
 
     //Library Library Groups Children names
-    private static final String KEY_LIBRARY_CHILDREN_ID = "_id";
+    private static final String KEY_LIBRARY_CHILD_ID = "_id";
     private static final String KEY_LIBRARY_CHILD_NAME = "child_name";
     private static final String KEY_LIBRARY_CHILD_GROUP_NAME = "group_name";
+
+    // [LibraryChild + Child] Table Column names
+    private static final String KEY_LCC_ID = "child_id";
+    private static final String KEY_LCC_CHILD_NAME = "child_name";
+    private static final String KEY_LCC_LIBRARY_CHILD_ID = "library_child_id";
+    private static final String KEY_LCC_LIBRARY_CHILD_NAME = "library_child_name";
+    private static final String KEY_LCC_LIBRARY_CHILD_CHECKBOX = "library_child_checkbox";
 
     public static synchronized DBHandler getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -67,22 +76,33 @@ public class DBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("PRAGMA foreign_keys=ON");
+        db.execSQL("PRAGMA foreign_keys = ON");
         String CREATE_CHILDREN_TABLE = "CREATE TABLE " + TABLE_CHILDREN + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
-                + KEY_AGE + " TEXT" + ")";
+                + KEY_AGE + " TEXT)";
 
         String CREATE_LIBRARY_GROUPS_TABLE = "CREATE TABLE " + TABLE_LIBRARY_GROUPS + "("
                 + KEY_GROUP_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NAME + " TEXT" + ")";
 
         String CREATE_LIBRARY_GROUPS_CHILD_TABLE = "CREATE TABLE " + TABLE_LIBRARY_CHILDREN + "("
-                + KEY_LIBRARY_CHILDREN_ID + " INTEGER PRIMARY KEY," + KEY_LIBRARY_CHILD_NAME + " TEXT," +
+                + KEY_LIBRARY_CHILD_ID + " INTEGER PRIMARY KEY," + KEY_LIBRARY_CHILD_NAME + " TEXT," +
                 "group_id INTEGER NOT NULL," + KEY_LIBRARY_CHILD_GROUP_NAME + " TEXT," +
                 "FOREIGN KEY (group_id) REFERENCES " + TABLE_LIBRARY_GROUPS +
                 "(" + KEY_GROUP_ID + "))";
+
+        String CREATE_LC_TABLE = "CREATE TABLE " + TABLE_LCC + "("
+                + KEY_LCC_ID + " INTEGER," + KEY_LCC_CHILD_NAME + " TEXT," +
+                KEY_LCC_LIBRARY_CHILD_ID + " INTEGER,"
+                + KEY_LCC_LIBRARY_CHILD_NAME + " TEXT," +
+                KEY_LCC_LIBRARY_CHILD_CHECKBOX + " INTEGER DEFAULT 0," +
+                "FOREIGN KEY (" + KEY_LCC_ID + ") REFERENCES " + TABLE_CHILDREN + "(" + KEY_ID + ")," +
+                "FOREIGN KEY (" + KEY_LCC_LIBRARY_CHILD_ID + ") REFERENCES " + TABLE_LIBRARY_CHILDREN +
+                "(" + KEY_LIBRARY_CHILD_ID + "))";
+
         db.execSQL(CREATE_LIBRARY_GROUPS_TABLE);
         db.execSQL(CREATE_CHILDREN_TABLE);
         db.execSQL(CREATE_LIBRARY_GROUPS_CHILD_TABLE);
+        db.execSQL(CREATE_LC_TABLE);
     }
 
     @Override
@@ -90,6 +110,7 @@ public class DBHandler extends SQLiteOpenHelper {
         //Drop older table if one exist
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILDREN);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIBRARY_GROUPS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIBRARY_CHILDREN);
         //Create tables again
         onCreate(db);
     }
@@ -185,11 +206,6 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    private boolean checkDataBaseExist(Context context, String dbName) {
-        File dbFile = context.getDatabasePath(dbName);
-        return dbFile.exists();
-    }
-
     public int getLibraryGroupCount() {
         String countQuery = "SELECT * FROM " + TABLE_LIBRARY_GROUPS;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -202,7 +218,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return count;
     }
 
-    public void addGroup(LibraryGroup group) {
+    public void addLibraryGroup(LibraryGroup group) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NAME, group.getGroupName());
@@ -212,7 +228,7 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close(); // Close database connection
     }
 
-    public Cursor getAllGroups() {
+    public Cursor getAllLibraryGroups() {
         // Select all Query
         String selectQuery = "SELECT * FROM " + TABLE_LIBRARY_GROUPS;
         SQLiteDatabase db = this.getWritableDatabase();
@@ -222,24 +238,32 @@ public class DBHandler extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor fetchGroup() {
-        String query = "SELECT * FROM " + TABLE_LIBRARY_GROUPS;
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery(query, null);
+    public List<LibraryGroup> getAllLibraryGroupsList(){
+        List<LibraryGroup> list = new ArrayList<>();
+        Cursor cursor = getAllLibraryGroups();
+        if (cursor.moveToFirst()) {
+            do {
+                LibraryGroup group = new LibraryGroup();
+                group.setId(Integer.parseInt(cursor.getString(0)));
+                group.setName(cursor.getString(1));
+                list.add(group);
+            } while (cursor.moveToNext());
+        }
+        return list;
     }
 
-    public Cursor fetchChildren(String libraryChild) {
+    public Cursor getLibraryGroupChildren(String groupId) {
         String query = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN + " WHERE " + KEY_GROUP_ID + " = " +
-                "'" + libraryChild + "'";
+                "'" + groupId + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery(query, null);
     }
 
-    public void addGroupChild(LibraryChild groupChild) {
+    public void addLibraryGroupChild(LibraryChild groupChild) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_LIBRARY_CHILD_NAME, groupChild.getName());
-        values.put("group_id", getLibraryGroupId(groupChild.getGroupName()));
+        values.put("group_id", getLibraryGroupFromId(groupChild.getGroupName()));
         values.put("group_name", groupChild.getGroupName());
 
         //Insert Row
@@ -247,7 +271,25 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close(); // Close database connection
     }
 
-    public Cursor getAllGroupChildren(int id){
+    public LibraryChild getLibraryGroupChild(int childId){
+        String query = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN + " WHERE " + KEY_LIBRARY_CHILD_ID
+                + " = " + childId;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        LibraryChild child = new LibraryChild();
+        LibraryGroup group;
+        if (cursor.moveToFirst()){
+            do {
+                child.setId(cursor.getInt(0));
+                child.setName(cursor.getString(1));
+                child.setGroup(group = getLibraryGroupFromId(cursor.getInt(2)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return child;
+    }
+
+    public Cursor getAllLibraryGroupChildren(int id){
         // Select all Query
         String selectQuery = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN +
                 " WHERE group_id = " + "'" + id + "'";
@@ -274,7 +316,23 @@ public class DBHandler extends SQLiteOpenHelper {
         return lGroup;
     }
 
-    public int getLibraryGroupId(String groupName){
+    public LibraryGroup getLibraryGroupFromId(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        LibraryGroup lGroup = new LibraryGroup();
+        String query = "SELECT * FROM " + TABLE_LIBRARY_GROUPS + " WHERE " + KEY_GROUP_ID + " = " +
+                "'" + id + "'";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                lGroup.setId(Integer.parseInt(cursor.getString(0)));
+                lGroup.setName(cursor.getString(1));
+
+            } while (cursor.moveToNext());
+        }
+        return lGroup;
+    }
+
+    public int getLibraryGroupFromId(String groupName){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT " + KEY_GROUP_ID + " FROM " + TABLE_LIBRARY_GROUPS + " WHERE "
                 + KEY_GROUP_NAME + " = " +
@@ -297,5 +355,26 @@ public class DBHandler extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(query, null);
 
         return c;
+    }
+
+    public void addLccMeeting(Child child, LibraryChild libraryChild){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_LCC_ID, child.getId());
+        values.put(KEY_LCC_CHILD_NAME, child.getName());
+        values.put(KEY_LCC_LIBRARY_CHILD_ID, libraryChild.getId());
+        values.put(KEY_LCC_LIBRARY_CHILD_NAME, libraryChild.getName());
+        values.put(KEY_LCC_LIBRARY_CHILD_CHECKBOX, 1);
+
+        //Insert Row
+        db.insert(TABLE_LCC, null, values);
+        db.close(); // Close database connection
+    }
+
+    public void removeLccMeeting(int childId, int libraryChildId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String where = KEY_LCC_ID + " = ?" + " & " + KEY_LCC_LIBRARY_CHILD_ID + " = ?";
+        String[] args = new String[]{String.valueOf(childId), String.valueOf(libraryChildId)};
+        db.delete(TABLE_LCC, where, args);
     }
 }

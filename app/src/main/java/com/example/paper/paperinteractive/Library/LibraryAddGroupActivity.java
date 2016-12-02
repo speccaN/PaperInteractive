@@ -1,15 +1,16 @@
 package com.example.paper.paperinteractive.Library;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,11 +26,16 @@ import com.example.paper.paperinteractive.R;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO Lägga till dialog att bekräfta när man går tillbaka (cancel operation)
+
 public class LibraryAddGroupActivity extends AppCompatActivity implements
         LibraryAddChildFragment.OnChildAdded {
 
+    private ProgressDialog progressBar;
+
     RecyclerView recyclerView;
-    RecyclerView.Adapter adapter;
+    MyAdapter adapter;
+    DefaultItemAnimator animator;
     List<LibraryChild> mDataset;
     RecyclerView.LayoutManager layoutManager;
 
@@ -43,6 +49,11 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_add_group);
 
+        progressBar = new ProgressDialog(this);
+        progressBar.setMessage("Lägger till Grupp");
+        progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressBar.setCancelable(false);
+
         emptyText = (TextView) findViewById(R.id.text_empty_recycler);
 
         tempGroup = new LibraryGroup();
@@ -50,6 +61,9 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
         Button addGroupButton = (Button) findViewById(R.id.btnAddGroup);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_group_children);
+        animator = new DefaultItemAnimator();
+        animator.setAddDuration(500);
+        recyclerView.setItemAnimator(animator);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -76,37 +90,13 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 if(!groupTitle.getText().toString().equals("")) {
+                    progressBar.setMax(100);
+                    progressBar.setProgress(0);
+                    progressBar.show();
                     new LongOperation().execute();
                 }
             }
         });
-    }
-
-    private class LongOperation extends AsyncTask<Void, Void, String>{
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            DBHandler db = DBHandler.getInstance(getApplicationContext());
-            db.addGroup(tempGroup);
-            for (LibraryChild child : tempGroup.getList()) {
-                db.addGroupChild(child);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Intent returnIntent = new Intent();
-            setResult(RESULT_OK, returnIntent);
-            finish();
-        }
     }
 
     private void UpdateRecyclerView() {
@@ -119,59 +109,98 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
         }
     }
 
+    private class LongOperation extends AsyncTask<Void, Integer, Void>{
+
+        int counter = 1;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            DBHandler db = DBHandler.getInstance(getApplicationContext());
+            db.addLibraryGroup(tempGroup);
+            for (LibraryChild child : tempGroup.getList()) {
+                db.addLibraryGroupChild(child);
+                counter++;
+                publishProgress((counter*100)/tempGroup.getList().size());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            progressBar.setProgress(values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Intent returnIntent = new Intent();
+            setResult(RESULT_OK, returnIntent);
+            finish();
+            progressBar.dismiss();
+        }
+    }
+
     // Event listener från LibraryAddChildFragment
     @Override
     public void onChildAdded() {
         mDataset = tempGroup.getList();
-        adapter.notifyDataSetChanged();
+        adapter.addItem();
         if (recyclerView.getVisibility() == View.GONE)
             UpdateRecyclerView();
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
-
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
-            public TextView mTextView;
-            public ViewHolder(TextView v) {
-                super(v);
-                mTextView = v;
-            }
-        }
-
+    private class MyAdapter extends RecyclerView.Adapter<ViewHolder>{
 
         public MyAdapter(List<LibraryChild> myDataset) {
             mDataset = myDataset;
         }
         public MyAdapter(){mDataset = new ArrayList<>();}
 
-
-
         // Create new views (invoked by the layout manager)
         @Override
-        public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // Create a new view
-            View v = LayoutInflater.from(parent.getContext())
+            View v = getLayoutInflater()
                     .inflate(android.R.layout.simple_list_item_1, parent, false);
 
-            ViewHolder vh = new ViewHolder((TextView) v);
-            return vh;
+            return new ViewHolder(v);
         }
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
-        public void onBindViewHolder(MyAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.mTextView.setText(mDataset.get(position).getName());
         }
 
+        public void addItem() {
+            adapter.notifyItemInserted(mDataset.size());
+        }
+
         @Override
         public int getItemCount() {
             return mDataset.size();
+        }
+    }
+
+
+    // Provide a reference to the views for each data item
+    // Complex data items may need more than one view per item, and
+    // you provide access to all the views for a data item in a view holder
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public TextView mTextView;
+        public ViewHolder(View v) {
+            super(v);
+            mTextView = (TextView) v;
         }
     }
 }

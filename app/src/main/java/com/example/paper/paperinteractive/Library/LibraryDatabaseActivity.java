@@ -1,8 +1,6 @@
 package com.example.paper.paperinteractive.Library;
 
 import android.app.ExpandableListActivity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,17 +12,36 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleCursorTreeAdapter;
 
 import com.example.paper.paperinteractive.Database.DBHandler;
-import com.example.paper.paperinteractive.Fragments.LibraryAddGroupFragment;
 import com.example.paper.paperinteractive.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
-import static java.security.AccessController.getContext;
-
 public class LibraryDatabaseActivity extends ExpandableListActivity{
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        groupsCursor = dbHandler.getAllLibraryGroups();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (groupsCursor != null) {
+            if (!groupsCursor.isClosed()) {
+                groupsCursor.close();
+            }
+        }
+
+        if (childCursor != null) {
+            if (!childCursor.isClosed()) {
+                childCursor.close();
+            }
+        }
+    }
 
     DBHandler dbHandler;
     Cursor groupsCursor; // Cursor for list of groups (lists top nodes)
-    Cursor childCursor;
+    Cursor childCursor; // Cursor for list of children (child nodes)
 
     MyAdapter adapter;
 
@@ -41,7 +58,7 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        adapter.changeCursor(dbHandler.getAllGroups());
+        adapter.changeCursor(dbHandler.getAllLibraryGroups());
     }
 
     @Override
@@ -61,9 +78,8 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
 
         fab = (FloatingActionButton) findViewById(R.id.fabtoolbar_fab);
 
-        groupsCursor = dbHandler.getAllGroups();
+        groupsCursor = dbHandler.getAllLibraryGroups();
 
-        groupsCursor.moveToFirst();
         adapter = new MyAdapter(this,
                 groupsCursor,
                 android.R.layout.simple_expandable_list_item_1,
@@ -144,7 +160,7 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
 
         @Override
         protected Cursor getChildrenCursor(Cursor cursor) {
-            childCursor = dbHandler.getAllGroupChildren(Integer.parseInt(cursor.getString(0)));
+            childCursor = dbHandler.getAllLibraryGroupChildren(Integer.parseInt(cursor.getString(0)));
             return childCursor;
         }
     }

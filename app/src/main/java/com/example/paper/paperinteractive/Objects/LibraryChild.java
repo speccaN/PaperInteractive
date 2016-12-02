@@ -42,4 +42,12 @@ public class LibraryChild {
     public String getGroupName() {
         return group.getGroupName();
     }
+
+    public LibraryGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(LibraryGroup group) {
+        this.group = group;
+    }
 }

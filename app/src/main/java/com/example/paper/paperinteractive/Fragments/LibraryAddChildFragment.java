@@ -33,8 +33,6 @@ public class LibraryAddChildFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    DBHandler dbHandler;
-
     private OnChildAdded mListener;
 
     public LibraryAddChildFragment() {
@@ -132,7 +130,6 @@ public class LibraryAddChildFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnChildAdded {
-        // TODO: Update argument type and name
         void onChildAdded();
     }
 }

@@ -1,11 +1,14 @@
 package com.example.paper.paperinteractive.Objects;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Child implements Serializable {
 
     private int _id;
     private String _name, _age;
+    private List<LibraryChild> libraryChildList = new ArrayList<>();
 
     // Parameter-less constructor
     public Child(){
@@ -44,5 +47,13 @@ public class Child implements Serializable {
 
     public int getId() {
         return _id;
+    }
+
+    public List<LibraryChild> getLibraryChildList() {
+        return libraryChildList;
+    }
+
+    public int getListCount(){
+        return libraryChildList.size();
     }
 }
