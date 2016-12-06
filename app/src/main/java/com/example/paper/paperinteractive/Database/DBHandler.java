@@ -23,17 +23,12 @@ public class DBHandler extends SQLiteOpenHelper {
     //Database Name
     private static final String DATABASE_NAME = "PaperInteractiveDB";
 
-    //Children table name
-    private static final String TABLE_CHILDREN = "children";
-
-    //Library Groups table name
-    private static final String TABLE_LIBRARY_GROUPS = "library_groups";
-
-    //Library Groups Children table name
-    private static final String TABLE_LIBRARY_CHILDREN = "library_children";
-
-    // LibraryChild + Child Table name
-    private static final String TABLE_LCC = "LCC";
+    //TABLES
+    private static final String TABLE_CHILDREN = "Children"; //Children table name
+    private static final String TABLE_LIBRARY_GROUPS = "Library_Groups"; //Library Groups table name
+    private static final String TABLE_LIBRARY_CHILDREN = "Library_Children"; //Library Groups Children table name
+    private static final String TABLE_MEETINGS = "Meetings"; // Meeting Table Name
+    private static final String TABLE_ASSIGNED_EXERCISES = "Assigned_Exercises";
 
     //Children Table Columns names
     private static final String KEY_ID = "_id";
@@ -49,12 +44,18 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_LIBRARY_CHILD_NAME = "child_name";
     private static final String KEY_LIBRARY_CHILD_GROUP_NAME = "group_name";
 
-    // [LibraryChild + Child] Table Column names
-    private static final String KEY_LCC_ID = "child_id";
-    private static final String KEY_LCC_CHILD_NAME = "child_name";
-    private static final String KEY_LCC_LIBRARY_CHILD_ID = "library_child_id";
-    private static final String KEY_LCC_LIBRARY_CHILD_NAME = "library_child_name";
-    private static final String KEY_LCC_LIBRARY_CHILD_CHECKBOX = "library_child_checkbox";
+    // Meetings Table Column names
+    private static final String KEY_MEETINGS_MEETING_ID = "_id";
+    private static final String KEY_MEETINGS_ID = "child_id";
+    private static final String KEY_MEETINGS_CHILD_NAME = "child_name";
+    private static final String KEY_MEETINGS_DATE = "date";
+
+    // Assigned Exercises table column names
+    private static final String KEY_AE_CHILD_ID = "child_id";
+    private static final String KEY_AE_CHILD_NAME = "child_name";
+    private static final String KEY_AE_EXERCISE_ID = "exercise_id";
+    private static final String KEY_AE_EXERCISE_GROUP = "exercise_group";
+    private static final String KEY_AE_EXERCISE_NAME = "exercise_name";
 
     public static synchronized DBHandler getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -90,19 +91,28 @@ public class DBHandler extends SQLiteOpenHelper {
                 "FOREIGN KEY (group_id) REFERENCES " + TABLE_LIBRARY_GROUPS +
                 "(" + KEY_GROUP_ID + "))";
 
-        String CREATE_LC_TABLE = "CREATE TABLE " + TABLE_LCC + "("
-                + KEY_LCC_ID + " INTEGER," + KEY_LCC_CHILD_NAME + " TEXT," +
-                KEY_LCC_LIBRARY_CHILD_ID + " INTEGER,"
-                + KEY_LCC_LIBRARY_CHILD_NAME + " TEXT," +
-                KEY_LCC_LIBRARY_CHILD_CHECKBOX + " INTEGER DEFAULT 0," +
-                "FOREIGN KEY (" + KEY_LCC_ID + ") REFERENCES " + TABLE_CHILDREN + "(" + KEY_ID + ")," +
-                "FOREIGN KEY (" + KEY_LCC_LIBRARY_CHILD_ID + ") REFERENCES " + TABLE_LIBRARY_CHILDREN +
-                "(" + KEY_LIBRARY_CHILD_ID + "))";
+        String CREATE_MEETINGS_TABLE = "CREATE TABLE " + TABLE_MEETINGS + "("
+                + KEY_MEETINGS_MEETING_ID + " INTEGER PRIMARY KEY,"
+                + KEY_MEETINGS_ID + " INTEGER," + KEY_MEETINGS_CHILD_NAME + " TEXT,"
+                + KEY_MEETINGS_DATE + " TIMESTAMP DEFAULT CURRENT_DATE,"
+                + "FOREIGN KEY (" + KEY_MEETINGS_ID + ") REFERENCES " + TABLE_CHILDREN + "(" + KEY_ID + "))";
+
+        String CREATE_AE_TABLE = "CREATE TABLE " + TABLE_ASSIGNED_EXERCISES + "("
+                + KEY_AE_CHILD_ID + " INTEGER,"
+                + KEY_AE_CHILD_NAME + " TEXT,"
+                + KEY_AE_EXERCISE_ID + " INTEGER,"
+                + KEY_AE_EXERCISE_GROUP + " TEXT,"
+                + KEY_AE_EXERCISE_NAME + " TEXT,"
+                + "FOREIGN KEY (" + KEY_AE_CHILD_ID + ") " +
+                "REFERENCES " + TABLE_CHILDREN + "(" + KEY_ID + "), "
+                + "FOREIGN KEY (" + KEY_AE_EXERCISE_ID + ") " +
+                "REFERENCES " + TABLE_LIBRARY_CHILDREN + "(" + KEY_LIBRARY_CHILD_ID + "))";
 
         db.execSQL(CREATE_LIBRARY_GROUPS_TABLE);
         db.execSQL(CREATE_CHILDREN_TABLE);
         db.execSQL(CREATE_LIBRARY_GROUPS_CHILD_TABLE);
-        db.execSQL(CREATE_LC_TABLE);
+        db.execSQL(CREATE_MEETINGS_TABLE);
+        db.execSQL(CREATE_AE_TABLE);
     }
 
     @Override
@@ -145,7 +155,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // Get all Children in Database
     public ArrayList<Child> getAllChildren() {
-        ArrayList<Child> childList = new ArrayList<Child>();
+        ArrayList<Child> childList = new ArrayList<>();
 
         // Select all Query
         String selectQuery = "SELECT * FROM " + TABLE_CHILDREN;
@@ -232,10 +242,9 @@ public class DBHandler extends SQLiteOpenHelper {
         // Select all Query
         String selectQuery = "SELECT * FROM " + TABLE_LIBRARY_GROUPS;
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
 
         // Return Group Cursor
-        return cursor;
+        return db.rawQuery(selectQuery, null);
     }
 
     public List<LibraryGroup> getAllLibraryGroupsList(){
@@ -294,10 +303,9 @@ public class DBHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN +
                 " WHERE group_id = " + "'" + id + "'";
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
 
         // Return Group Cursor
-        return cursor;
+        return db.rawQuery(selectQuery, null);
     }
 
     public LibraryGroup getLibraryGroup(String group) {
@@ -313,6 +321,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return lGroup;
     }
 
@@ -329,6 +338,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return lGroup;
     }
 
@@ -352,29 +362,34 @@ public class DBHandler extends SQLiteOpenHelper {
                 TABLE_LIBRARY_CHILDREN + " INNER JOIN " + TABLE_LIBRARY_GROUPS +
                 " ON library_children.library_group_id = groups._id";
 
-        Cursor c = db.rawQuery(query, null);
-
-        return c;
+        return db.rawQuery(query, null);
     }
 
-    public void addLccMeeting(Child child, LibraryChild libraryChild){
+    public void addMeeting(Child child, LibraryChild[] exercises){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_LCC_ID, child.getId());
-        values.put(KEY_LCC_CHILD_NAME, child.getName());
-        values.put(KEY_LCC_LIBRARY_CHILD_ID, libraryChild.getId());
-        values.put(KEY_LCC_LIBRARY_CHILD_NAME, libraryChild.getName());
-        values.put(KEY_LCC_LIBRARY_CHILD_CHECKBOX, 1);
-
+        values.put(KEY_MEETINGS_ID, child.getId());
+        values.put(KEY_MEETINGS_CHILD_NAME, child.getName());
         //Insert Row
-        db.insert(TABLE_LCC, null, values);
+        db.insert(TABLE_MEETINGS, null, values);
+
+        for (int i = 0; i < exercises.length; i++){
+            ContentValues aeValues = new ContentValues();
+            aeValues.put(KEY_AE_CHILD_ID, child.getId());
+            aeValues.put(KEY_AE_CHILD_NAME, child.getName());
+            aeValues.put(KEY_AE_EXERCISE_ID, exercises[i].getId());
+            aeValues.put(KEY_AE_EXERCISE_GROUP, exercises[i].getGroupName());
+            aeValues.put(KEY_AE_EXERCISE_NAME, exercises[i].getName());
+            db.insert(TABLE_ASSIGNED_EXERCISES, null, aeValues);
+        }
+
         db.close(); // Close database connection
     }
 
-    public void removeLccMeeting(int childId, int libraryChildId) {
+    public void removeLccMeeting(int childId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String where = KEY_LCC_ID + " = ?" + " & " + KEY_LCC_LIBRARY_CHILD_ID + " = ?";
-        String[] args = new String[]{String.valueOf(childId), String.valueOf(libraryChildId)};
-        db.delete(TABLE_LCC, where, args);
+        String where = KEY_MEETINGS_ID + " = ?";
+        String[] args = new String[]{String.valueOf(childId)};
+        db.delete(TABLE_MEETINGS, where, args);
     }
 }

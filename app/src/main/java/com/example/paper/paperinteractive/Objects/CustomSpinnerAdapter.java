@@ -1,7 +1,6 @@
 package com.example.paper.paperinteractive.Objects;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.paper.paperinteractive.R;
-import com.google.android.gms.vision.text.Text;
-
-/**
- * Created by Eric on 2016-11-30.
- */
 
 public class CustomSpinnerAdapter extends ArrayAdapter<Child> {
 
@@ -42,7 +36,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<Child> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         // Inflate the view
         View v = convertView;

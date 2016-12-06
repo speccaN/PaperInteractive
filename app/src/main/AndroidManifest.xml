@@ -4,6 +4,7 @@
 
     <!-- To access Google+ APIs: -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -25,9 +26,10 @@
         <activity android:name=".ListViewLoader" />
         <activity android:name=".Library.LibraryActivity" />
         <activity android:name=".Library.LibraryDatabaseActivity" />
-        <activity android:name=".Library.LibraryAddGroupActivity"
-            android:windowSoftInputMode="adjustPan">
-        </activity>
+        <activity
+            android:name=".Library.LibraryAddGroupActivity"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity android:name=".PdfActivity"/>
     </application>
 
 </manifest>

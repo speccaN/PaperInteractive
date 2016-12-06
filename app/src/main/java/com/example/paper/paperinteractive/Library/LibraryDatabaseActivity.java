@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -39,13 +38,13 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
         }
     }
 
-    DBHandler dbHandler;
-    Cursor groupsCursor; // Cursor for list of groups (lists top nodes)
-    Cursor childCursor; // Cursor for list of children (child nodes)
+    private DBHandler dbHandler;
+    private Cursor groupsCursor; // Cursor for list of groups (lists top nodes)
+    private Cursor childCursor; // Cursor for list of children (child nodes)
 
-    MyAdapter adapter;
+    private MyAdapter adapter;
 
-    FloatingActionButton fab;
+    //FloatingActionButton fab;
     private FABToolbarLayout layout;
     private View btnAdd;
     private View btnEdit;
@@ -53,7 +52,7 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
     private View fab_toolbar;
     private boolean isExpanded = false;
 
-    int requestCode = 1;
+    private int requestCode = 1;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -76,7 +75,7 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
         btnEdit = findViewById(R.id.library_database_edit);
         btnDelete = findViewById(R.id.library_database_delete);
 
-        fab = (FloatingActionButton) findViewById(R.id.fabtoolbar_fab);
+        //fab_toolbar = (FloatingActionButton) findViewById(R.id.fabtoolbar_fab);
 
         groupsCursor = dbHandler.getAllLibraryGroups();
 
@@ -91,7 +90,7 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
 
         expandableListView.setAdapter(adapter);
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab_toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 layout.show();

@@ -2,7 +2,6 @@ package com.example.paper.paperinteractive.Fragments;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,13 +19,13 @@ import java.util.List;
 
 public class MeetingSelectLibraryFragment extends Fragment {
 
-    List<LibraryGroup> mGroupSet;
-    RecyclerView.LayoutManager layoutManager;
-    RecyclerView recyclerView;
-    MyAdapter adapter;
-    LayoutInflater layoutInflater;
-    DBHandler dbHandler;
-    Bundle checks;
+    private List<LibraryGroup> mGroupSet;
+    private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView recyclerView;
+    private MyAdapter adapter;
+    private LayoutInflater layoutInflater;
+    private DBHandler dbHandler;
+    private Bundle checks;
 
     public MeetingSelectLibraryFragment() {
         // Required empty public constructor

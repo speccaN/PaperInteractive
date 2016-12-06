@@ -9,8 +9,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,39 +22,40 @@ import android.widget.TextView;
 import com.example.paper.paperinteractive.Database.DBHandler;
 import com.example.paper.paperinteractive.Fragments.MeetingSelectChildFragment;
 import com.example.paper.paperinteractive.Fragments.MeetingSelectLibraryFragment;
-import com.example.paper.paperinteractive.Library.SerializableSparseArray;
+import com.example.paper.paperinteractive.Interfaces.SendData;
 import com.example.paper.paperinteractive.Objects.Child;
 import com.example.paper.paperinteractive.Objects.CustomSpinnerAdapter;
 import com.example.paper.paperinteractive.Objects.LibraryChild;
+import com.example.paper.paperinteractive.PDF_Printing.CustomPdfCreator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MeetingActivity extends AppCompatActivity
-        implements MeetingSelectChildFragment.OnFragmentCheckedListener{
+        implements MeetingSelectChildFragment.OnFragmentCheckedListener,
+        MeetingSelectChildFragment.OnFragmentStartListener{
 
-    Spinner spinner;
-    CustomSpinnerAdapter adapter;
-    Button btnTempAdd;
+    private Spinner spinner;
+    private CustomSpinnerAdapter adapter;
+    private Button btnTempAdd;
 
-    RecyclerView recyclerView;
-    DefaultItemAnimator animator;
-    LinearLayoutManager linearLayoutManager;
-    CustomRecyclerAdapter customRecyclerAdapter;
-    List<LibraryChild> mDataset;
+    private RecyclerView recyclerView;
+    private DefaultItemAnimator animator;
+    private LinearLayoutManager linearLayoutManager;
+    private CustomRecyclerAdapter customRecyclerAdapter;
+    private List<LibraryChild> mDataset;
 
     public TextView childName;
-    TextView childAge;
-    TextView tempEmptyText;
+    private TextView childAge;
+    private TextView tempEmptyText;
 
-    DBHandler dbHandler;
+    private DBHandler dbHandler;
 
-    Bundle checks = new Bundle();
-    Integer groupId = null;
-    Integer childId = null;
+    private List<Integer> childChecks;
+    private SendData mSendData;
 
-    Fragment fragment = new MeetingSelectLibraryFragment();
-    FragmentManager fragmentManager = getFragmentManager();
+    private Fragment fragment = new MeetingSelectLibraryFragment();
+    private FragmentManager fragmentManager = getFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +92,6 @@ public class MeetingActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if (fragmentManager.getBackStackEntryCount() == 0) {
-                    fragment.setArguments(checks);
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.animator.slide_in_bottom,
                             0, 0, R.animator.slide_out_bottom);
@@ -142,23 +141,19 @@ public class MeetingActivity extends AppCompatActivity
         });
     }
 
-    private void SaveChecks(int childId, int groupId, int libraryChildId){
-        if (checks.getSerializable(childName.getText().toString()) != childName.getText().toString()) {
-            // Outer
-            // KEY: Child = Position in Spinner
-            // VALUE: SparseArray<INTEGER, INTEGER>
-            SerializableSparseArray<SparseIntArray> outer =
-                    new SerializableSparseArray<SparseIntArray>();
-
-            // Inner : (Initial capacity of how many children (performance))
-            // KEY: Group id
-            // VALUE: Child id
-            SparseIntArray inner = new SparseIntArray(adapter.getCount());
+    private void SaveChecks(int libraryChildId){
+        if (childChecks == null)
+            childChecks = new ArrayList<>();
 
             // Adding
-            inner.append(groupId, libraryChildId);
-            outer.append(childId, inner);
-            checks.putSerializable(childName.getText().toString(), outer);
+            childChecks.add(libraryChildId);
+    }
+
+    private void DeleteChecks(int libraryChildId){
+        for (int i = 0; i < childChecks.size(); i++){
+            if (childChecks.get(i) == libraryChildId){
+                childChecks.remove(i);
+            }
         }
     }
 
@@ -173,7 +168,18 @@ public class MeetingActivity extends AppCompatActivity
 
         switch (item.getItemId()){
             case R.id.action_confirm:
-                //TODO Do something
+                //View view = getWindow().getDecorView().findViewById(android.R.id.content);
+                dbHandler.addMeeting((Child)spinner.getSelectedItem(),
+                        mDataset.toArray(new LibraryChild[mDataset.size()]));
+                Log.d("MEETING: ", "Meeting added");
+
+                String[] names = new String[mDataset.size()];
+                for (int i = 0; i < mDataset.size(); i++) {
+                    names[i] = mDataset.get(i).getGroupName() + ": " + mDataset.get(i).getName();
+                }
+                CustomPdfCreator.CreatePDF(this, ((Child) spinner.getSelectedItem()).getName(),
+                        names);
+                finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -184,13 +190,21 @@ public class MeetingActivity extends AppCompatActivity
         LibraryChild tempLibraryChild = dbHandler.getLibraryGroupChild(childId);
         Child tempChild = (Child) spinner.getSelectedItem();
         if (checked) {
-            SaveChecks(tempChild.getId(), groupId, childId);
-            dbHandler.addLccMeeting(tempChild, tempLibraryChild);
+            SaveChecks(childId);
+            //dbHandler.addMeeting(tempChild, tempLibraryChild);
             mDataset.add(tempLibraryChild);
             customRecyclerAdapter.addItem();
             UpdateRecyclerView();
         } else {
-            dbHandler.removeLccMeeting(tempChild.getId(), tempLibraryChild.getId());
+            for(int i = 0; i < mDataset.size(); i++){
+                if (mDataset.get(i).getId() == tempLibraryChild.getId()){
+                    //dbHandler.removeLccMeeting(tempChild.getId(), tempLibraryChild.getId());
+                    DeleteChecks(childId);
+                    mDataset.remove(i);
+                    customRecyclerAdapter.removeItem(i);
+                    break;
+                }
+            }
             UpdateRecyclerView();
         }
     }
@@ -205,6 +219,15 @@ public class MeetingActivity extends AppCompatActivity
             tempEmptyText.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onFragmentStart() {
+        mSendData.onSendData(childChecks);
+    }
+
+    public void setOnSendDataListener(MeetingSelectChildFragment meetingSelectChildFragment) {
+        mSendData = meetingSelectChildFragment;
     }
 
     private class CustomRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
@@ -223,8 +246,12 @@ public class MeetingActivity extends AppCompatActivity
             holder.mTextView.setText(mDataset.get(position).getName());
         }
 
-        public void addItem(){
+        void addItem(){
             customRecyclerAdapter.notifyItemInserted(mDataset.size());
+        }
+
+        void removeItem(int position) {
+            customRecyclerAdapter.notifyItemRemoved(position);
         }
 
         @Override
@@ -235,9 +262,9 @@ public class MeetingActivity extends AppCompatActivity
 
     static class ViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView mTextView;
+        TextView mTextView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             mTextView = (TextView) itemView;
         }

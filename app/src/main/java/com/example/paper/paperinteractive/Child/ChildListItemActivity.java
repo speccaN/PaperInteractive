@@ -3,7 +3,6 @@ package com.example.paper.paperinteractive.Child;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.app.FragmentTransaction;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -11,8 +10,7 @@ import com.example.paper.paperinteractive.Fragments.ChildListItemFragment;
 import com.example.paper.paperinteractive.Objects.Child;
 import com.example.paper.paperinteractive.R;
 
-public class ChildListItemActivity extends AppCompatActivity
-        implements ChildListItemFragment.OnFragmentInteractionListener{
+public class ChildListItemActivity extends AppCompatActivity {
 
     public Child child;
 
@@ -33,16 +31,5 @@ public class ChildListItemActivity extends AppCompatActivity
         ChildListItemFragment fragment = new ChildListItemFragment();
         fragmentTransaction.add(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
-
-
-/*        TextView childName = (TextView) this.findViewById(R.id.textChildName);
-        childName.setText(child.getName());*/
-
-
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 }

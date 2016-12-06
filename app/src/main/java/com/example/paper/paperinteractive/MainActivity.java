@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnLibrary = (Button) findViewById(R.id.btnLibrary);
         Button btnMeeting = (Button) findViewById(R.id.btnMeeting);
         Button btn3 = (Button) findViewById(R.id.btnNewChild);
+        Button btnPdf = (Button) findViewById(R.id.btnViewPdf);
         final Button btnChildList = (Button) findViewById(R.id.btnChildList);
 
         TextView header = (TextView) findViewById(R.id.textHeader);
@@ -73,6 +74,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnPdf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), PdfActivity.class);
                 startActivity(intent);
             }
         });

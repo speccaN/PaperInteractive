@@ -1,6 +1,5 @@
 package com.example.paper.paperinteractive.Child;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,8 +19,8 @@ import java.util.List;
 
 public class ChildActivity extends AppCompatActivity {
 
-    Spinner spinner;
-    DBHandler db;
+    private Spinner spinner;
+    private DBHandler db;
 
 
 
@@ -65,7 +64,7 @@ public class ChildActivity extends AppCompatActivity {
             spinnerArray.add(i);
         }
 
-        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this,
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<>(this,
                 R.layout.support_simple_spinner_dropdown_item,
                 spinnerArray);
 
@@ -80,7 +79,7 @@ public class ChildActivity extends AppCompatActivity {
 
             popupWindow.setHeight(500);
         } catch (NoClassDefFoundError | ClassCastException | NoSuchFieldException | IllegalAccessException e) {
-
+            Log.e("Error: ", e.toString());
         }
     }
 }

@@ -2,12 +2,9 @@ package com.example.paper.paperinteractive.Objects;
 
 public class LibraryChild {
 
-    int mId;
-    //int groupId;
-    String name;
-    LibraryGroup group;
-
-    //LibraryGroup group;
+    private int mId;
+    private String name;
+    private LibraryGroup group;
 
     public LibraryChild(){
 

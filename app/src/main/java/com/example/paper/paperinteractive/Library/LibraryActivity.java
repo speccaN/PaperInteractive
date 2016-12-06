@@ -3,7 +3,6 @@ package com.example.paper.paperinteractive.Library;
 import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class LibraryActivity extends ExpandableListActivity implements ExpandableListAdapter {
 
@@ -27,8 +25,8 @@ public class LibraryActivity extends ExpandableListActivity implements Expandabl
     private List<HashMap<String, String>> groupData = new ArrayList<>(); // List of Group Maps
     private List<List<Map<String, String>>> listOfChildGroups = new ArrayList<>();
 
-    List<HashMap<String, String>> childData;
-    HashMap<String, String> groups;
+    private List<HashMap<String, String>> childData;
+    private HashMap<String, String> groups;
 
 
 

@@ -33,14 +33,14 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
 
     private ProgressDialog progressBar;
 
-    RecyclerView recyclerView;
-    MyAdapter adapter;
-    DefaultItemAnimator animator;
-    List<LibraryChild> mDataset;
-    RecyclerView.LayoutManager layoutManager;
+    private RecyclerView recyclerView;
+    private MyAdapter adapter;
+    private DefaultItemAnimator animator;
+    private List<LibraryChild> mDataset;
+    private RecyclerView.LayoutManager layoutManager;
 
     public EditText groupTitle;
-    TextView emptyText;
+    private TextView emptyText;
 
     public LibraryGroup tempGroup;
 

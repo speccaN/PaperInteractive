@@ -34,7 +34,7 @@ public class ChildListActivity extends AppCompatActivity {
 
         mRecyclerView = (RecyclerView) findViewById(R.id.child_recycler_view);
 
-        ArrayList<Child> myDataset = new ArrayList<Child>();
+        ArrayList<Child> myDataset = new ArrayList<>();
 
         myDataset = db.getAllChildren();
 
@@ -101,8 +101,7 @@ public class ChildListActivity extends AppCompatActivity {
             // set the view's size, margins, paddings and layout parameters
             v.findViewById(R.id.textName);
             v.setPadding(10, 10, 10, 10);
-            ViewHolder vh = new ViewHolder(v);
-            return vh;
+            return new ViewHolder(v);
         }
 
         // Replace the contents of a view (invoked by the layout manager)
