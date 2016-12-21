@@ -1,15 +1,20 @@
 package com.example.paper.paperinteractive.Database;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import com.example.paper.paperinteractive.Objects.Child;
 import com.example.paper.paperinteractive.Objects.LibraryChild;
 import com.example.paper.paperinteractive.Objects.LibraryGroup;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +34,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String TABLE_LIBRARY_CHILDREN = "Library_Children"; //Library Groups Children table name
     private static final String TABLE_MEETINGS = "Meetings"; // Meeting Table Name
     private static final String TABLE_ASSIGNED_EXERCISES = "Assigned_Exercises";
+    private static final String TABLE_MEDIA = "Media";
 
     //Children Table Columns names
     private static final String KEY_ID = "_id";
@@ -56,6 +62,10 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_AE_EXERCISE_ID = "exercise_id";
     private static final String KEY_AE_EXERCISE_GROUP = "exercise_group";
     private static final String KEY_AE_EXERCISE_NAME = "exercise_name";
+
+    // Media table column names
+    private static final String KEY_MEDIA_EXERCISE_ID = "exercise_id";
+    private static final String KEY_MEDIA_FILE = "media_file";
 
     public static synchronized DBHandler getInstance(Context context) {
         // Use the application context, which will ensure that you
@@ -108,11 +118,18 @@ public class DBHandler extends SQLiteOpenHelper {
                 + "FOREIGN KEY (" + KEY_AE_EXERCISE_ID + ") " +
                 "REFERENCES " + TABLE_LIBRARY_CHILDREN + "(" + KEY_LIBRARY_CHILD_ID + "))";
 
+        String CREATE_MEDIA_TABLE = "CREATE TABLE " + TABLE_MEDIA + "("
+                + KEY_MEDIA_EXERCISE_ID + " INTEGER,"
+                + KEY_MEDIA_FILE + " TEXT,"
+                + "FOREIGN KEY (" + KEY_MEDIA_EXERCISE_ID + ") "
+                + "REFERENCES " + TABLE_LIBRARY_CHILDREN + "(" + KEY_LIBRARY_CHILD_ID + "))";
+
         db.execSQL(CREATE_LIBRARY_GROUPS_TABLE);
         db.execSQL(CREATE_CHILDREN_TABLE);
         db.execSQL(CREATE_LIBRARY_GROUPS_CHILD_TABLE);
         db.execSQL(CREATE_MEETINGS_TABLE);
         db.execSQL(CREATE_AE_TABLE);
+        db.execSQL(CREATE_MEDIA_TABLE);
     }
 
     @Override
@@ -261,11 +278,21 @@ public class DBHandler extends SQLiteOpenHelper {
         return list;
     }
 
-    public Cursor getLibraryGroupChildren(String groupId) {
-        String query = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN + " WHERE " + KEY_GROUP_ID + " = " +
+    public List<LibraryChild> getLibraryGroupChildren(int groupId) {
+        List<LibraryChild> list = new ArrayList<>();
+        String query = "SELECT * FROM " + TABLE_LIBRARY_CHILDREN + " WHERE group_id = "  +
                 "'" + groupId + "'";
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery(query, null);
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()){
+            do {
+                LibraryChild child = new LibraryChild();
+                child.setId(Integer.parseInt(cursor.getString(0)));
+                child.setName(cursor.getString(1));
+                list.add(child);
+            } while (cursor.moveToNext());
+        }
+        return list;
     }
 
     public void addLibraryGroupChild(LibraryChild groupChild) {
@@ -391,5 +418,30 @@ public class DBHandler extends SQLiteOpenHelper {
         String where = KEY_MEETINGS_ID + " = ?";
         String[] args = new String[]{String.valueOf(childId)};
         db.delete(TABLE_MEETINGS, where, args);
+    }
+
+    public void addMedia(int id, String uri) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_MEDIA_EXERCISE_ID, id);
+        values.put(KEY_MEDIA_FILE, uri);
+        db.insert(TABLE_MEDIA, null, values);
+        db.close();
+    }
+
+    public List<Uri> getMediaUris(int mID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Uri> uriList = new ArrayList<>();
+        String query = "SELECT media_file FROM " + TABLE_MEDIA + " WHERE " + KEY_MEDIA_EXERCISE_ID + " = " +
+                "'" + mID + "'";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Uri path = Uri.parse(cursor.getString(0));
+                uriList.add(path);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return uriList;
     }
 }

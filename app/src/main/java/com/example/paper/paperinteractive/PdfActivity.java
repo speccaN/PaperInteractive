@@ -18,6 +18,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PdfActivity extends AppCompatActivity {
 
@@ -60,10 +63,6 @@ public class PdfActivity extends AppCompatActivity {
 
             dir = new File(mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString());
             pdfs = dir.listFiles();
-        }
-
-        public File getPDF(int position){
-            return pdfs[position];
         }
 
         @Override

@@ -1,14 +1,22 @@
 package com.example.paper.paperinteractive.Library;
 
+import android.app.Activity;
 import android.app.ExpandableListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.SimpleCursorTreeAdapter;
+import android.widget.TextView;
 
 import com.example.paper.paperinteractive.Database.DBHandler;
 import com.example.paper.paperinteractive.R;
@@ -52,6 +60,8 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
     private View fab_toolbar;
     private boolean isExpanded = false;
 
+    private String groupName;
+    private int groupID = 0;
     private int requestCode = 1;
 
     @Override
@@ -61,13 +71,24 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
     }
 
     @Override
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+        TextView textView = (TextView) v.findViewById(android.R.id.text1);
+        Intent intent = new Intent(this, ExpandableListChild.class);
+        intent.putExtra("ID", id);
+        intent.putExtra("NAME", textView.getText().toString());
+        startActivity(intent);
+        return super.onChildClick(parent, v, groupPosition, childPosition, id);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library_database_toolbar);
 
         dbHandler = DBHandler.getInstance(this);
 
-        ExpandableListView expandableListView = getExpandableListView();
+        final ExpandableListView expandableListView = getExpandableListView();
 
         layout = (FABToolbarLayout) findViewById(R.id.fabtoolbar);
         fab_toolbar = findViewById(R.id.fabtoolbar_fab);
@@ -75,20 +96,39 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
         btnEdit = findViewById(R.id.library_database_edit);
         btnDelete = findViewById(R.id.library_database_delete);
 
-        //fab_toolbar = (FloatingActionButton) findViewById(R.id.fabtoolbar_fab);
-
         groupsCursor = dbHandler.getAllLibraryGroups();
 
         adapter = new MyAdapter(this,
                 groupsCursor,
-                android.R.layout.simple_expandable_list_item_1,
+                R.layout.groupview,
                 new String[]{"group_name"},
-                new int[]{android.R.id.text1},
+                new int[]{R.id.textView3},
                 android.R.layout.simple_expandable_list_item_1,
                 new String[]{"child_name", "_id"},
                 new int[]{android.R.id.text1, android.R.id.text2});
 
         expandableListView.setAdapter(adapter);
+        expandableListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (ExpandableListView.getPackedPositionType(l) ==
+                        ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                    Snackbar s = Snackbar.make(view, "Long press on ID: " + i,
+                            Snackbar.LENGTH_SHORT);
+                    s.show();
+                    expandableListView.setItemChecked(i, true);
+                    Cursor e = (Cursor) expandableListView.getItemAtPosition(i);
+                    groupName = e.getString(1);
+                    groupID = Integer.parseInt(e.getString(0));
+/*                    Cursor cursor = adapter.getGroup(i);
+                    cursor.moveToFirst();
+                    groupName = cursor.getString(1);
+                    groupID = Integer.parseInt(cursor.getString(0));*/
+                    return true;
+                }
+                return true;
+            }
+        });
 
         fab_toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +153,11 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
             public void onClick(View view) {
                 Snackbar s = Snackbar.make(view,"Edit Pressed", Snackbar.LENGTH_SHORT);
                 s.show();
-
+                Intent intent = new Intent(LibraryDatabaseActivity.this,
+                        LibraryAddGroupActivity.class);
+                intent.putExtra("GROUP", groupName);
+                intent.putExtra("ID", groupID);
+                startActivityForResult(intent, requestCode);
             }
         });
 
@@ -134,6 +178,7 @@ public class LibraryDatabaseActivity extends ExpandableListActivity{
                 isExpanded = false;
             }
         });
+
 
 
     }

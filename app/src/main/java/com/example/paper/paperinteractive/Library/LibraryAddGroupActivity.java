@@ -43,6 +43,9 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
     private TextView emptyText;
 
     public LibraryGroup tempGroup;
+    List<LibraryChild> list = new ArrayList<>();
+
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,10 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
             }
         });
 
+        intent = getIntent();
+        if (intent != null)
+            groupTitle.setText(intent.getStringExtra("GROUP"));
+
         adapter = new MyAdapter();
         recyclerView.setAdapter(adapter);
 
@@ -85,6 +92,11 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
         Fragment addChildFragment = new LibraryAddChildFragment();
         fragmentTransaction.add(R.id.child_fragment_container, addChildFragment);
         fragmentTransaction.commit();
+
+        if (intent != null){
+            GetListOperation task = new GetListOperation(list);
+            task.execute(intent.getStringExtra("GROUP"));
+        }
 
         addGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,6 +156,30 @@ public class LibraryAddGroupActivity extends AppCompatActivity implements
             setResult(RESULT_OK, returnIntent);
             finish();
             progressBar.dismiss();
+        }
+    }
+
+    private class GetListOperation extends AsyncTask<String, Integer, Void>{
+
+        List<LibraryChild> mList;
+
+        public GetListOperation(List<LibraryChild> list) {
+            mList = list;
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            list = new ArrayList<>();
+            DBHandler db = DBHandler.getInstance(getApplicationContext());
+            list = db.getLibraryGroupChildren(intent.getIntExtra("ID", 0));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mDataset = list;
+            adapter.notifyDataSetChanged();
+            UpdateRecyclerView();
         }
     }
 

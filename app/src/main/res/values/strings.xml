@@ -14,4 +14,6 @@
     <string name="welcome">Välkommen!</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="age">Ålder:</string>
+    <string name="empty_media">Övningen har ingen media. \n Var god lägg till</string>
+    <string name="add_media">Add Media</string>
 </resources>
